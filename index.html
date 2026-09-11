@@ -789,7 +789,7 @@ button{cursor:pointer}
             </div>
             <div class="form-group">
                 <label for="codeInput">编码</label>
-                <input class="title-input" id="codeInput" type="text" inputmode="numeric" autocomplete="off" placeholder="留空按科目自动生成">
+                <input class="title-input" id="codeInput" type="text" inputmode="numeric" autocomplete="off">
             </div>
             <button class="add-button" id="addBtn" type="button">提交</button>
         </section>
@@ -1714,8 +1714,7 @@ function render(){
             <div class="cards-content">${renderMarkdownLinks(item.content)}</div>
             <div class="cards-footer">
                 <div class="cards-meta-left">
-                    <div class="cards-subject">${esc(item.subject)}</div>
-                    <div class="cards-code">${esc(item.code)}</div>
+                    <div class="cards-code">${esc(item.subject)}${esc(item.code)}</div>
                 </div>
                 ${unlocked?`<div class="item-actions"><button class="action-btn edit-btn" data-id="${attr(item.id)}" type="button">编辑</button></div>`:''}
             </div>
