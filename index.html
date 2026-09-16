@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="app-build" content="2026-09-11-test-subject-code-v1">
+<meta name="app-build" content="2026-09-16-test-blog-cards-architecture-final">
 <meta name="test-data-file" content="test_data.json">
 <title>Test</title>
 <style>
@@ -130,23 +130,13 @@ button{cursor:pointer}
     font-weight:700;
     letter-spacing:.04em;
 }
-.title-input{
-    display:block;
-    width:100%;
-    min-height:44px;
-    padding:.72rem 1rem;
-    border:1px solid #cbd5e1;
-    border-radius:15px;
-    background:#fff;
-    color:#0f172a;
-    outline:none;
-}
-.title-input:focus{
-    outline:2px solid #93b4ff;
-    outline-offset:1px;
-    border-color:transparent;
-}
-.title-input[readonly]{background:#f8fafc;color:#64748b;}
+
+.title-field-label{color:#475569;font-size:.78rem;font-weight:700;letter-spacing:.04em}
+.title-options{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;min-height:44px;padding:.55rem .75rem;border:1px solid #cbd5e1;border-radius:15px;background:#fff}
+.title-choice{display:inline-flex;align-items:center;gap:7px;color:#334155;font-size:.9rem!important;font-weight:400!important;letter-spacing:0!important;cursor:pointer;user-select:none}
+.title-choice input{appearance:none;-webkit-appearance:none;width:17px!important;height:17px!important;min-height:17px!important;margin:0!important;padding:0!important;border:1.5px solid #94a3b8!important;border-radius:3px!important;background:#fff!important;box-shadow:none!important;cursor:pointer}
+.title-choice input:checked{border-color:#1E40AF!important;background:#1E40AF!important;box-shadow:inset 0 0 0 3px #fff!important}
+.title-choice input:focus-visible{outline:2px solid #93c5fd!important;outline-offset:2px}
 .rich-editor-wrap{
     position:relative;
     overflow:hidden;
@@ -249,11 +239,6 @@ button{cursor:pointer}
     touch-action:none;
 }
 .rich-editor-scrollbar-thumb:active{cursor:grabbing}
-.rich-editor:empty::before{
-    content:attr(data-placeholder);
-    color:#94a3b8;
-    pointer-events:none;
-}
 .rich-editor p,.rich-editor div,.cards-content p,.cards-content div{margin:.3em 0}
 .rich-editor ul,.rich-editor ol,.cards-content ul,.cards-content ol{padding-left:1.7em;margin:.45em 0}
 .rich-editor blockquote,.cards-content blockquote{
@@ -325,12 +310,12 @@ button{cursor:pointer}
 }
 .cards-item::after{content:"";display:block;clear:both}
 .cards-item > *{max-width:100%}
-.cards-title,.cards-content,.cards-subject,.cards-code{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.cards-title,.cards-content,.cards-code{min-width:0;overflow-wrap:anywhere;word-break:break-word}
 .cards-item:hover{background:#fafcff}
 .cards-title{
     margin-bottom:.45rem;
     color:#1E40AF;
-    font-size:1.08rem;
+    font-size:1.05rem;
     font-weight:600;
     line-height:1.45;
     overflow-wrap:anywhere;
@@ -346,15 +331,18 @@ button{cursor:pointer}
 .cards-content a{color:#1E40AF;text-decoration:none}
 .cards-content a:hover,.cards-content a:focus-visible{color:#1E3A8A;text-decoration:underline;outline:none}
 
-/* 数学公式：MathJax SVG 输出在卡片内自适应；长公式允许横向滚动，避免撑破卡片。 */
-.cards-content mjx-container[jax="SVG"]{
+/* 数学公式：与 Demo / Note / Repo 统一使用 MathJax CHTML；长公式允许横向滚动。 */
+.cards-content mjx-container[jax="CHTML"]{
     max-width:100%;
-    overflow-x:auto;
-    overflow-y:hidden;
     vertical-align:middle;
 }
 .cards-content mjx-container[display="true"]{
+    display:block!important;
+    max-width:100%;
     margin:.8em 0!important;
+    padding:0!important;
+    overflow-x:auto;
+    overflow-y:hidden;
     text-align:center;
 }
 .rich-editor img,.cards-content img{
@@ -377,7 +365,7 @@ button{cursor:pointer}
     vertical-align:top;
 }
 .rich-editor th,.cards-content th{background:#f8fafc;font-weight:700}
-.cards-footer{
+ .cards-footer{
     display:flex;
     align-items:flex-end;
     justify-content:space-between;
@@ -389,19 +377,11 @@ button{cursor:pointer}
     min-width:0;
     flex:1 1 auto;
     color:#64748b;
-    font-size:.86rem;
+    font-size:.82rem;
     font-weight:400;
     line-height:1.5;
     overflow-wrap:anywhere;
 }
-
-.subject-options{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;min-height:44px;padding:.55rem .75rem;border:1px solid #cbd5e1;border-radius:15px;background:#fff}
-.subject-choice{display:inline-flex;align-items:center;gap:7px;color:#334155;font-size:.9rem;cursor:pointer;user-select:none}
-.subject-choice input{appearance:none;-webkit-appearance:none;width:17px!important;height:17px!important;min-height:17px!important;margin:0!important;padding:0!important;border:1.5px solid #94a3b8!important;border-radius:3px!important;background:#fff!important;box-shadow:none!important;cursor:pointer}
-.subject-choice input:checked{border-color:#1E40AF!important;background:#1E40AF!important;box-shadow:inset 0 0 0 3px #fff!important}
-.subject-choice input:focus-visible{outline:2px solid #93c5fd!important;outline-offset:2px}
-.cards-subject{color:#64748b;font-size:.86rem;font-weight:400;line-height:1.5}
-.cards-meta-left{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:1px}
 .item-actions{
     flex:0 0 auto;
     display:flex;
@@ -423,13 +403,13 @@ button{cursor:pointer}
     background:transparent;
     color:#64748b;
     font-weight:500;
-    text-decoration:underline;
-    text-underline-offset:2px;
+    text-decoration:none;
 }
 .edit-btn:hover,
 .edit-btn:focus-visible{
     background:transparent;
     color:#1e3a8a;
+    text-decoration:none;
     outline:none;
 }
 .delete-btn{background:#fee2e2;color:#991b1b}
@@ -532,6 +512,10 @@ button{cursor:pointer}
 #editModal .dialog-actions .btn{
     flex:0 0 auto;
 }
+
+/* 编辑弹窗标题选项与新增区保持同一套四选项布局。 */
+#editModal .title-options{display:grid;grid-template-columns:repeat(4,max-content);align-items:center;column-gap:24px;row-gap:10px;min-height:44px}
+@media(max-width:520px){#editModal .title-options{grid-template-columns:repeat(2,max-content)}}
 
 /* 登录配置弹窗：内容独立滚动，底部按钮始终保留在可见区域 */
 #configModal{
@@ -666,11 +650,9 @@ button{cursor:pointer}
         width:6px;
     }
     .editor-btn{padding:.26rem .52rem}
-    .cards-footer{align-items:flex-end}
     .cards-item{padding:1.05rem 1rem 1.2rem}
-    .cards-title{font-size:1.02rem}
-    .cards-content{font-size:.95rem}
-    .cards-subject,.cards-code{font-size:.82rem}
+    .cards-title{font-size:1.05rem}
+    .cards-content{font-size:1rem}
     .dialog{width:100%;border-radius:20px}
     .dialog-scroll{padding:1.2rem 1.2rem .8rem}
     .dialog-actions{padding:.85rem 1.2rem max(.85rem,env(safe-area-inset-bottom))}
@@ -750,11 +732,16 @@ button{cursor:pointer}
         <section class="add-section hidden" id="editorSection">
             <h2>添加</h2>
             <div class="form-group" style="margin-bottom:.9rem">
-                <label for="titleInput">标题</label>
-                <input class="title-input" id="titleInput" type="text" autocomplete="off">
+                <div class="title-field-label">标题</div>
+                <div class="title-options" id="titleOptions" role="radiogroup" aria-label="标题（必选）">
+                    <label class="title-choice"><input type="radio" name="titleChoice" value="语文">语文</label>
+                    <label class="title-choice"><input type="radio" name="titleChoice" value="数学">数学</label>
+                    <label class="title-choice"><input type="radio" name="titleChoice" value="英语">英语</label>
+                    <label class="title-choice"><input type="radio" name="titleChoice" value="科学">科学</label>
+                </div>
             </div>
             <div class="form-group" style="margin-bottom:.9rem">
-                <label for="contentInput">内容</label>
+                <label for="contentInput">正文</label>
                 <div class="rich-editor-wrap">
                     <div class="rich-editor" id="contentInput" contenteditable="true" role="textbox" aria-multiline="true"></div>
                     <div class="rich-toolbar" id="contentToolbar" role="toolbar" aria-label="正文格式工具">
@@ -778,19 +765,6 @@ button{cursor:pointer}
                     <input id="contentImageInput" type="file" accept="image/*" multiple hidden>
                 </div>
             </div>
-            <div class="form-group" style="margin-top:.9rem;margin-bottom:.9rem">
-                <label>科目 <span aria-hidden="true">*</span></label>
-                <div class="subject-options" id="subjectOptions" role="radiogroup" aria-label="科目（必选）">
-                    <label class="subject-choice"><input type="radio" name="subject" value="语文">语文</label>
-                    <label class="subject-choice"><input type="radio" name="subject" value="数学">数学</label>
-                    <label class="subject-choice"><input type="radio" name="subject" value="英语">英语</label>
-                    <label class="subject-choice"><input type="radio" name="subject" value="科学">科学</label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="codeInput">编码</label>
-                <input class="title-input" id="codeInput" type="text" inputmode="numeric" autocomplete="off">
-            </div>
             <button class="add-button" id="addBtn" type="button">提交</button>
         </section>
 
@@ -811,13 +785,18 @@ button{cursor:pointer}
         <div class="dialog-scroll">
             <h3 id="editHeading">编辑 Test</h3>
             <div class="form-group">
-                <label for="editTitle">标题</label>
-                <input class="title-input" id="editTitle" type="text" autocomplete="off" placeholder="可留空">
+                <div class="title-field-label">标题</div>
+                <div class="title-options" id="editTitleOptions" role="radiogroup" aria-label="标题（必选）">
+                    <label class="title-choice"><input type="radio" name="editTitleChoice" value="语文">语文</label>
+                    <label class="title-choice"><input type="radio" name="editTitleChoice" value="数学">数学</label>
+                    <label class="title-choice"><input type="radio" name="editTitleChoice" value="英语">英语</label>
+                    <label class="title-choice"><input type="radio" name="editTitleChoice" value="科学">科学</label>
+                </div>
             </div>
             <div class="form-group">
                 <label for="editContent">内容</label>
                 <div class="rich-editor-wrap">
-                    <div class="rich-editor" id="editContent" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="请输入内容；Ctrl / ⌘ + Enter 保存"></div>
+                    <div class="rich-editor" id="editContent" contenteditable="true" role="textbox" aria-multiline="true"></div>
                     <div class="rich-toolbar" id="editToolbar" role="toolbar" aria-label="编辑正文格式工具">
                         <button class="editor-btn" type="button" data-command="bold" title="加粗"><b>B</b></button>
                         <button class="editor-btn" type="button" data-command="italic" title="斜体"><i>I</i></button>
@@ -838,19 +817,6 @@ button{cursor:pointer}
                     </div>
                     <input id="editImageInput" type="file" accept="image/*" multiple hidden>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>科目 <span aria-hidden="true">*</span></label>
-                <div class="subject-options" id="editSubjectOptions" role="radiogroup" aria-label="科目（必选）">
-                    <label class="subject-choice"><input type="radio" name="editSubject" value="语文">语文</label>
-                    <label class="subject-choice"><input type="radio" name="editSubject" value="数学">数学</label>
-                    <label class="subject-choice"><input type="radio" name="editSubject" value="英语">英语</label>
-                    <label class="subject-choice"><input type="radio" name="editSubject" value="科学">科学</label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="editCode">编码</label>
-                <input class="title-input" id="editCode" type="text" inputmode="numeric" autocomplete="off" readonly>
             </div>
         </div>
         <div class="dialog-actions">
@@ -886,7 +852,7 @@ button{cursor:pointer}
             </div>
             <label class="remember-row">
                 <input type="checkbox" id="rememberToken" checked>
-                <span>在本设备保存 Token。取消勾选时，Token 仅保存到当前浏览器会话。</span>
+                <span>在本设备保存 Token。取消勾选时，Token 仅保留在当前页面打开期间。</span>
             </label>
         </div>
         <div class="dialog-actions">
@@ -919,19 +885,32 @@ function hashIdentity(value){
 }
 const NS=`test_private:${hashIdentity(pageIdentity())}`;
 const CONFIG_KEY=`${NS}:config`;
-const TOKEN_LOCAL_KEY=`${NS}:token_local`;
-const TOKEN_SESSION_KEY=`${NS}:token_session`;
-const CACHE_KEY=`${NS}:cache`;
+const TOKEN_KEY=`${NS}:token`;
+const WORK_CACHE_KEY=`${NS}:cache`;
+const PUBLIC_CACHE_KEY=`${NS}:public_cache`;
 const META_KEY=`${NS}:meta`;
 
+// 正式运行页面不使用 Web Storage：配置、Token、同步元数据进入 IndexedDB；
+// 编辑工作副本进入 IndexedDB，并额外镜像到 OPFS。公开只读缓存独立存放，避免覆盖未同步工作副本。
+const APP_DB_NAME='test_app_v2';
+const APP_DB_VERSION=1;
+const APP_STORE='kv';
+const WORK_OPFS_FILE=`test_${hashIdentity(pageIdentity())}_working_v2.json`;
+
+// 草稿层与 Demo / Note / Repo 对齐：IndexedDB + OPFS 双层持久化。
+const DRAFT_DB_NAME='test_entry_draft_v1';
+const DRAFT_DB_VERSION=1;
+const DRAFT_STORE='records';
+const ADD_DRAFT_KEY=`${NS}:draft:add`;
+const EDIT_DRAFT_KEY=`${NS}:draft:edit`;
+const DRAFT_FILE_STEM=`test_${hashIdentity(pageIdentity())}_draft_v1`;
+const ADD_DRAFT_OPFS_FILE=`${DRAFT_FILE_STEM}_add.json`;
+const EDIT_DRAFT_OPFS_FILE=`${DRAFT_FILE_STEM}_edit.json`;
+const DRAFT_INTERVAL=5000;
+const DRAFT_LOCAL_DEBOUNCE=500;
+
 const MAX_BYTES=750*1024;
-const SUBJECT_CODE_RANGES=Object.freeze({
-    '语文':[950001,959999],
-    '数学':[960001,969999],
-    '英语':[970001,979999],
-    '科学':[980001,989999]
-});
-const SUBJECTS=Object.freeze(Object.keys(SUBJECT_CODE_RANGES));
+const UNIX_FOLDER_MIN=1000000000,UNIX_FOLDER_MAX=9999999999;
 const AUTO_DELAY=700;
 const API_VERSION='2026-03-10';
 const PUBLIC_DATA_FILE=cleanPublicDataFile(
@@ -947,11 +926,27 @@ const $=id=>document.getElementById(id);
 const statusDot=$('statusDot'),statusText=$('statusText'),syncBtn=$('syncBtn'),configBtn=$('configBtn'),
 exportBtn=$('exportBtn'),importBtn=$('importBtn'),fileInput=$('fileInput'),lastSyncTime=$('lastSyncTime'),
 lockedPanel=$('lockedPanel'),lockedConfigBtn=$('lockedConfigBtn'),appContent=$('appContent'),editorSection=$('editorSection'),
-titleInput=$('titleInput'),subjectOptions=$('subjectOptions'),codeInput=$('codeInput'),contentInput=$('contentInput'),contentToolbar=$('contentToolbar'),contentImageInput=$('contentImageInput'),addBtn=$('addBtn'),countDisplay=$('countDisplay'),cardsList=$('cardsList'),
-editModal=$('editModal'),editTitle=$('editTitle'),editSubjectOptions=$('editSubjectOptions'),editCode=$('editCode'),editContent=$('editContent'),editToolbar=$('editToolbar'),editImageInput=$('editImageInput'),editDelete=$('editDelete'),editCancel=$('editCancel'),editSave=$('editSave'),
+titleOptions=$('titleOptions'),contentInput=$('contentInput'),contentToolbar=$('contentToolbar'),contentImageInput=$('contentImageInput'),addBtn=$('addBtn'),countDisplay=$('countDisplay'),cardsList=$('cardsList'),
+editModal=$('editModal'),editTitleOptions=$('editTitleOptions'),editContent=$('editContent'),editToolbar=$('editToolbar'),editImageInput=$('editImageInput'),editDelete=$('editDelete'),editCancel=$('editCancel'),editSave=$('editSave'),
 configModal=$('configModal'),configForm=$('configForm'),cfgOwner=$('cfgOwner'),cfgRepo=$('cfgRepo'),
 cfgFile=$('cfgFile'),cfgToken=$('cfgToken'),rememberToken=$('rememberToken'),configCancel=$('configCancel'),
 configSave=$('configSave'),backToTopBtn=$('backToTopBtn'),toast=$('toast');
+
+const TITLE_VALUES=Object.freeze(['语文','数学','英语','科学']);
+function normalizeTitleValue(value){
+    const title=String(value??'').trim();
+    return TITLE_VALUES.includes(title)?title:'';
+}
+function selectedTitle(container){
+    return normalizeTitleValue(container?.querySelector('input[type="radio"]:checked')?.value||'');
+}
+function setSelectedTitle(container,value){
+    const title=normalizeTitleValue(value);
+    [...(container?.querySelectorAll('input[type="radio"]')||[])].forEach(input=>{input.checked=input.value===title;});
+}
+function clearSelectedTitle(container){
+    [...(container?.querySelectorAll('input[type="radio"]')||[])].forEach(input=>{input.checked=false;});
+}
 
 let state=[];
 let config={owner:'',repo:'',file:'test_data.json',token:''};
@@ -964,6 +959,17 @@ let editingId='';
 let editInitialSnapshot='';
 let editOverlayPointer=null;
 let toastTimer=null;
+let addDraftTimer=null,addDraftInputTimer=null,addDraftLastSnapshot='';
+let editDraftTimer=null,editDraftInputTimer=null,editDraftLastSnapshot='';
+let draftWriteChain=Promise.resolve();
+let draftsRestoredThisSession=false;
+
+const appCache=new Map();
+let appDbPromise=null;
+let appWriteChain=Promise.resolve();
+let workingCopyOpfsRecord=null;
+let workingCopyOpfsWriteChain=Promise.resolve();
+
 const pendingUploads=new WeakMap();
 const savedEditorRanges=new WeakMap();
 
@@ -986,7 +992,7 @@ function attr(v){return esc(v).replace(/"/g,'&quot;')}
 function uid(){
     return crypto?.randomUUID
         ? crypto.randomUUID()
-        : `cards_${Date.now()}_${Math.random().toString(36).slice(2,10)}`;
+        : `test_${Date.now()}_${Math.random().toString(36).slice(2,10)}`;
 }
 function validIso(v){
     const s=clean(v);
@@ -1005,28 +1011,6 @@ function normalizeImageSrc(value){
     if(/^blob:/i.test(src)||/^https?:\/\//i.test(src))return src;
     if(/^[a-z][a-z0-9+.-]*:/i.test(src))return '';
     return src;
-}
-function normalizeSubject(value){
-    const subject=String(value??'').trim();
-    return SUBJECTS.includes(subject)?subject:'';
-}
-function subjectRange(subject){return SUBJECT_CODE_RANGES[normalizeSubject(subject)]||null;}
-function normalizeEntryCode(value,subject=''){
-    const code=Number.parseInt(String(value??''),10);
-    if(!Number.isInteger(code))return null;
-    const range=subjectRange(subject);
-    if(range)return code>=range[0]&&code<=range[1]?code:null;
-    return SUBJECTS.some(name=>{const [start,end]=SUBJECT_CODE_RANGES[name];return code>=start&&code<=end;})?code:null;
-}
-function selectedSubject(container){
-    return normalizeSubject(container?.querySelector('input[type="radio"]:checked')?.value||'');
-}
-function setSelectedSubject(container,value){
-    const subject=normalizeSubject(value);
-    [...(container?.querySelectorAll('input[type="radio"]')||[])].forEach(input=>{input.checked=input.value===subject;});
-}
-function clearSelectedSubject(container){
-    [...(container?.querySelectorAll('input[type="radio"]')||[])].forEach(input=>{input.checked=false;});
 }
 function anchorToMarkdownText(anchor){
     const label=(anchor.textContent||'').replace(/\u00a0/g,' ').trim();
@@ -1138,25 +1122,26 @@ function clipboardHtmlToMarkdownText(html,fallback=''){
 }
 // 数学输入保护：如果纯文本剪贴板含有 TeX/LaTeX 公式，必须优先采用纯文本原文。
 // 这样不会因为剪贴板同时携带 HTML 版本而丢失 $ 定界符或反斜杠命令。
-function looksLikeMathPlainText(value){
-    const text=String(value??'');
-    if(!text)return false;
-    return /\$\$[\s\S]+?\$\$/.test(text)
-        || /(^|[^\\])\$(?!\$)[^\r\n$]+?(?<!\\)\$(?!\$)/m.test(text)
-        || /\\\([\s\S]+?\\\)/.test(text)
-        || /\\\[[\s\S]+?\\\]/.test(text)
-        || /\\(?:sqrt|frac|dfrac|tfrac|sum|prod|int|lim|log|ln|sin|cos|tan|alpha|beta|gamma|theta|pi|infty|mathbf|mathrm|text|begin|left|right)\b/.test(text);
+function looksLikeLatexPlainText(text){
+    const s=String(text||'');
+    if(!s)return false;
+    if(/\$\$[\s\S]+?\$\$/.test(s))return true;
+    if(/\$(?!\$)(?:\\.|[^$\r\n])+?\$/.test(s))return true;
+    if(/\\\([\s\S]+?\\\)/.test(s))return true;
+    if(/\\\[[\s\S]+?\\\]/.test(s))return true;
+    return /\\(?:frac|dfrac|tfrac|sqrt|sum|prod|int|iint|iiint|oint|lim|log|ln|sin|cos|tan|arcsin|arccos|arctan|alpha|beta|gamma|delta|epsilon|varepsilon|theta|vartheta|lambda|mu|nu|xi|pi|rho|sigma|tau|phi|varphi|chi|psi|omega|Gamma|Delta|Theta|Lambda|Xi|Pi|Sigma|Phi|Psi|Omega|mathrm|mathbf|mathit|mathbb|mathcal|text|operatorname|begin|end|left|right|cdot|times|div|pm|mp|leq|geq|neq|approx|equiv|infty|partial|nabla|overline|underline|hat|widehat|bar|vec|dot|ddot|boxed)\b/.test(s);
 }
 function clipboardTextForEditor(plain,html){
     const rawPlain=String(plain??'');
-    if(looksLikeMathPlainText(rawPlain))return rawPlain.replace(/\r\n?/g,'\n');
+    if(looksLikeLatexPlainText(rawPlain))return rawPlain.replace(/\r\n?/g,'\n');
     return html?clipboardHtmlToMarkdownText(html,rawPlain):rawPlain;
 }
 
-// 动态加载 MathJax 4。只渲染总表正文，不处理 contenteditable，避免公式预览反向污染可编辑的原始 TeX。
+// 数学公式能力与 Demo / Note / Repo 对齐：MathJax 4 CHTML 主源 + 双回退。
 const MATHJAX_SOURCES=[
-    'https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-svg.js',
-    'https://unpkg.com/mathjax@4.1.3/tex-svg.js'
+    'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js',
+    'https://unpkg.com/mathjax@4/tex-chtml.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js'
 ];
 let mathJaxLoadPromise=null;
 let mathRenderVersion=0;
@@ -1169,10 +1154,10 @@ function ensureMathJax(){
         ...existing,
         tex:{
             ...(existing.tex||{}),
-            inlineMath:{'[+]':[['$','$']]},
+            inlineMath:[['$','$'],['\\(','\\)']],
+            displayMath:[['$$','$$'],['\\[','\\]']],
             processEscapes:true
         },
-        svg:{...(existing.svg||{}),fontCache:'global'},
         startup:{...(existing.startup||{}),typeset:false}
     };
 
@@ -1189,7 +1174,7 @@ function ensureMathJax(){
             script.crossOrigin='anonymous';
             script.onload=()=>{
                 if(window.MathJax&&typeof window.MathJax.typesetPromise==='function')resolve(window.MathJax);
-                else tryNext();
+                else{script.remove();tryNext();}
             };
             script.onerror=()=>{script.remove();tryNext();};
             document.head.appendChild(script);
@@ -1204,11 +1189,21 @@ function clearTypesetMath(container){
     }
 }
 function queueMathTypeset(container,version){
+    const rawHtml=container.innerHTML;
     ensureMathJax().then(async mathJax=>{
         if(version!==mathRenderVersion||!container.isConnected)return;
-        try{await mathJax.typesetPromise([container]);}
-        catch(error){console.error('数学公式渲染失败',error);}
-    }).catch(error=>console.error(error));
+        const ready=mathJax.startup&&mathJax.startup.promise?mathJax.startup.promise:Promise.resolve();
+        try{
+            await ready;
+            await mathJax.typesetPromise([container]);
+        }catch(error){
+            console.error('数学公式渲染失败',error);
+            if(version===mathRenderVersion&&container.isConnected)container.innerHTML=rawHtml;
+        }
+    }).catch(error=>{
+        console.error(error);
+        if(version===mathRenderVersion&&container.isConnected)container.innerHTML=rawHtml;
+    });
 }
 
 function plainTextToHtml(value){
@@ -1228,121 +1223,85 @@ function hasMeaningfulContent(value){
     return Boolean(div.querySelector('img,table'));
 }
 function getEditorHtml(editor){
+    normalizeEditorParagraphModelPreservingSelection(editor);
     return sanitizeHtml(editor.innerHTML);
 }
 function setEditorHtml(editor,value){
     editor.innerHTML=sanitizeHtml(value);
+    normalizeEditorParagraphModel(editor);
+}
+function normalizeAttachmentFolder(value){
+    const raw=String(value??'').trim();
+    if(!/^\d{10}$/.test(raw))return null;
+    const timestamp=Number(raw);
+    return Number.isSafeInteger(timestamp)&&timestamp>=UNIX_FOLDER_MIN&&timestamp<=UNIX_FOLDER_MAX
+        ? timestamp
+        : null;
+}
+function unixCodeFromCreatedAt(value){
+    const ms=Date.parse(String(value||''));
+    if(!Number.isFinite(ms))return '';
+    const seconds=Math.floor(ms/1000);
+    return String(seconds).padStart(10,'0').slice(0,8);
 }
 function normalizeEntry(x){
     if(!x||typeof x!=='object')return null;
-    const title=String(x.title??'').trim();
-    const subject=normalizeSubject(x.subject);
+    const id=clean(x.id)||uid();
+    // 旧 Test JSON 若仍有 subject，只在读取入口映射一次；新模型不再保存 subject 字段。
+    const title=normalizeTitleValue(x.title)||normalizeTitleValue(x.subject);
     const source=String(x.source??'').trim();
     const raw=String(x.content??'').trim();
     const content=x.contentFormat==='html'?sanitizeHtml(raw):plainTextToHtml(raw);
     const createdAt=validIso(x.createdAt);
-    if((!title&&!hasMeaningfulContent(content))||!createdAt||!subject)return null;
+    if(!title||!hasMeaningfulContent(content)||!createdAt)return null;
     return{
-        id:clean(x.id)||uid(),
-        code:normalizeEntryCode(x.code,subject),
+        id,
+        attachmentFolder:normalizeAttachmentFolder(x.attachmentFolder),
+        code:unixCodeFromCreatedAt(createdAt),
         title,
-        subject,
         source,
         content,
         contentFormat:'html',
         createdAt
     };
 }
-const zhTitleCollator=new Intl.Collator('zh-CN-u-co-pinyin',{
-    sensitivity:'base',
-    numeric:true
-});
-const enTitleCollator=new Intl.Collator('en',{
-    sensitivity:'base',
-    numeric:true
-});
-
-function getTitleSortGroup(title){
-    const value=String(title??'').trim();
-    if(!value)return 4;
-
-    const first=value.charAt(0);
-    if(/[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/u.test(first))return 0;
-    if(/[A-Za-z]/.test(first))return 1;
-    if(/[0-9]/.test(first))return 2;
-    return 3;
-}
-
-function getLeadingNumber(title){
-    const match=String(title??'').trim().match(/^\d+(?:\.\d+)?/);
-    return match?Number(match[0]):Number.POSITIVE_INFINITY;
-}
-
-function compareCardsByTitle(a,b){
-    const aTitle=String(a.title??'').trim();
-    const bTitle=String(b.title??'').trim();
-    const aGroup=getTitleSortGroup(aTitle);
-    const bGroup=getTitleSortGroup(bTitle);
-
-    // 中文 → 英文 → 数字 → 其他符号 → 无标题
-    if(aGroup!==bGroup)return aGroup-bGroup;
-
-    let compared=0;
-    if(aGroup===0){
-        // 中文按拼音排序，相当于按汉字拼音首字母由 A 到 Z。
-        compared=zhTitleCollator.compare(aTitle,bTitle);
-    }else if(aGroup===1){
-        compared=enTitleCollator.compare(aTitle,bTitle);
-    }else if(aGroup===2){
-        const numberDiff=getLeadingNumber(aTitle)-getLeadingNumber(bTitle);
-        if(numberDiff!==0)return numberDiff;
-        compared=enTitleCollator.compare(aTitle,bTitle);
-    }else if(aGroup===3){
-        compared=zhTitleCollator.compare(aTitle,bTitle);
-    }
-
-    if(compared!==0)return compared;
-
-    // 完全同序时保持稳定：先录入的在前。
-    const byTime=Date.parse(a.createdAt)-Date.parse(b.createdAt);
+function compareTestEntries(a,b){
+    // 唯一排序规则：语文 → 数学 → 英语 → 科学；各组内 Unix 时间戳前八位倒序。
+    const ai=TITLE_VALUES.indexOf(normalizeTitleValue(a.title));
+    const bi=TITLE_VALUES.indexOf(normalizeTitleValue(b.title));
+    if(ai!==bi)return ai-bi;
+    const ac=unixCodeFromCreatedAt(a.createdAt);
+    const bc=unixCodeFromCreatedAt(b.createdAt);
+    if(ac!==bc)return bc.localeCompare(ac);
+    const byTime=Date.parse(b.createdAt)-Date.parse(a.createdAt);
     if(byTime!==0)return byTime;
-    return String(a.id).localeCompare(String(b.id));
+    return String(b.id).localeCompare(String(a.id));
 }
 
 function normalizeState(value){
     const source=Array.isArray(value)?value:(value&&Array.isArray(value.entries)?value.entries:[]);
-    const entries=source.map(normalizeEntry).filter(Boolean).sort(compareCardsByTitle);
+    const entries=source.map(normalizeEntry).filter(Boolean).sort(compareTestEntries);
     const used=new Set();
     for(const item of entries){
-        const code=normalizeEntryCode(item.code,item.subject);
-        if(code!==null&&!used.has(code)){item.code=code;used.add(code);}else{item.code=null;}
-    }
-    for(const item of entries){
-        if(item.code!==null)continue;
-        item.code=allocateEntryCodeForSubject(item.subject,used);
-        used.add(item.code);
+        const folder=normalizeAttachmentFolder(item.attachmentFolder);
+        if(folder!==null&&!used.has(folder)){item.attachmentFolder=folder;used.add(folder);}
+        else item.attachmentFolder=null;
     }
     return entries;
 }
-function allocateEntryCodeForSubject(subject,usedSet=null){
-    const normalized=normalizeSubject(subject);
-    const range=subjectRange(normalized);
-    if(!range)throw new Error('请选择科目');
-    const used=usedSet||new Set(state.map(item=>normalizeEntryCode(item.code,item.subject)).filter(code=>code!==null));
-    for(let code=range[0];code<=range[1];code++)if(!used.has(code))return code;
-    throw new Error(`${normalized}编码区间 [${range[0]},${range[1]}] 已用完`);
-}
-function resolveNewEntryCode(raw,subject){
-    const normalized=normalizeSubject(subject);
-    const range=subjectRange(normalized);
-    if(!range)throw new Error('请选择科目');
-    const text=String(raw??'').trim();
-    if(!text)return allocateEntryCodeForSubject(normalized);
-    if(!/^\d{6}$/.test(text))throw new Error(`编码必须是 ${range[0]}–${range[1]} 范围内的六位数字`);
-    const code=normalizeEntryCode(text,normalized);
-    if(code===null)throw new Error(`${normalized}编码必须在 ${range[0]}–${range[1]} 范围内`);
-    if(state.some(item=>Number(item.code)===code))throw new Error(`编码 ${code} 已被使用`);
-    return code;
+function allocateAttachmentFolder(){
+    const used=new Set(
+        state.map(item=>normalizeAttachmentFolder(item.attachmentFolder)).filter(folder=>folder!==null)
+    );
+    let timestamp=Math.floor(Date.now()/1000);
+    if(timestamp<UNIX_FOLDER_MIN||timestamp>UNIX_FOLDER_MAX){
+        throw new Error('当前时间无法生成 10 位 Unix 附件目录');
+    }
+    while(used.has(timestamp)&&timestamp<UNIX_FOLDER_MAX)timestamp++;
+    if(used.has(timestamp)||timestamp>UNIX_FOLDER_MAX){
+        throw new Error('无法生成唯一的 Unix 附件目录');
+    }
+    return timestamp;
 }
 function fingerprint(value=state){
     return JSON.stringify(normalizeState(value));
@@ -1366,12 +1325,141 @@ function adminConfigured(){
 function pathEncode(path){
     return String(path).split('/').filter(Boolean).map(encodeURIComponent).join('/');
 }
-function localSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
-function localGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
-function sessionSet(k,v){try{sessionStorage.setItem(k,v);return true}catch(e){return false}}
-function sessionGet(k){try{return sessionStorage.getItem(k)}catch(e){return null}}
-function removeStored(k,kind='local'){
-    try{(kind==='local'?localStorage:sessionStorage).removeItem(k)}catch(e){}
+function openAppDb(){
+    if(appDbPromise)return appDbPromise;
+    appDbPromise=new Promise((resolve,reject)=>{
+        if(!('indexedDB' in window)){reject(new Error('IndexedDB unavailable'));return;}
+        const request=indexedDB.open(APP_DB_NAME,APP_DB_VERSION);
+        request.onupgradeneeded=()=>{
+            const db=request.result;
+            if(!db.objectStoreNames.contains(APP_STORE))db.createObjectStore(APP_STORE,{keyPath:'key'});
+        };
+        request.onsuccess=()=>resolve(request.result);
+        request.onerror=()=>reject(request.error||new Error('IndexedDB open failed'));
+    });
+    return appDbPromise;
+}
+async function enqueueAppPut(key,value){
+    appWriteChain=appWriteChain.catch(()=>{}).then(async()=>{
+        const db=await openAppDb();
+        await new Promise((resolve,reject)=>{
+            const tx=db.transaction(APP_STORE,'readwrite');
+            tx.objectStore(APP_STORE).put({key:String(key),value:String(value)});
+            tx.oncomplete=()=>resolve();
+            tx.onerror=()=>reject(tx.error||new Error('IndexedDB write failed'));
+            tx.onabort=()=>reject(tx.error||new Error('IndexedDB write aborted'));
+        });
+    });
+    return appWriteChain;
+}
+async function enqueueAppDelete(key){
+    appWriteChain=appWriteChain.catch(()=>{}).then(async()=>{
+        const db=await openAppDb();
+        await new Promise((resolve,reject)=>{
+            const tx=db.transaction(APP_STORE,'readwrite');
+            tx.objectStore(APP_STORE).delete(String(key));
+            tx.oncomplete=()=>resolve();
+            tx.onerror=()=>reject(tx.error||new Error('IndexedDB delete failed'));
+            tx.onabort=()=>reject(tx.error||new Error('IndexedDB delete aborted'));
+        });
+    });
+    return appWriteChain;
+}
+function appGet(key){
+    const k=String(key);
+    return appCache.has(k)?appCache.get(k):null;
+}
+function appSet(key,value){
+    const k=String(key),v=String(value);
+    appCache.set(k,v);
+    return enqueueAppPut(k,v);
+}
+function appDelete(key){
+    const k=String(key);
+    appCache.delete(k);
+    return enqueueAppDelete(k);
+}
+async function readWorkingCopyOpfs(){
+    if(!navigator.storage?.getDirectory)return null;
+    try{
+        const root=await navigator.storage.getDirectory();
+        const handle=await root.getFileHandle(WORK_OPFS_FILE);
+        const file=await handle.getFile();
+        const record=JSON.parse(await file.text());
+        return record&&typeof record==='object'&&typeof record.cacheJson==='string'?record:null;
+    }catch(error){return null;}
+}
+function queueWorkingCopyOpfsWrite(snapshot=state){
+    const normalized=normalizeState(snapshot);
+    const record={
+        savedAt:Date.now(),
+        fingerprint:fingerprint(normalized),
+        cacheJson:JSON.stringify(normalized)
+    };
+    workingCopyOpfsRecord=record;
+    workingCopyOpfsWriteChain=workingCopyOpfsWriteChain.catch(()=>{}).then(async()=>{
+        if(!navigator.storage?.getDirectory)return false;
+        const root=await navigator.storage.getDirectory();
+        const handle=await root.getFileHandle(WORK_OPFS_FILE,{create:true});
+        const writable=await handle.createWritable();
+        await writable.write(JSON.stringify(record));
+        await writable.close();
+        return true;
+    }).catch(error=>{
+        console.warn('OPFS 工作副本写入失败',error);
+        return false;
+    });
+    return workingCopyOpfsWriteChain;
+}
+async function initAppStorage(){
+    const db=await openAppDb();
+    await new Promise((resolve,reject)=>{
+        const tx=db.transaction(APP_STORE,'readonly');
+        const request=tx.objectStore(APP_STORE).getAll();
+        request.onsuccess=()=>{
+            appCache.clear();
+            for(const row of request.result||[])appCache.set(String(row.key),String(row.value??''));
+            resolve();
+        };
+        request.onerror=()=>reject(request.error||new Error('IndexedDB read failed'));
+    });
+    try{if(navigator.storage?.persist)await navigator.storage.persist();}catch(error){}
+    workingCopyOpfsRecord=await readWorkingCopyOpfs();
+    if(appGet(WORK_CACHE_KEY)===null&&workingCopyOpfsRecord?.cacheJson){
+        appCache.set(WORK_CACHE_KEY,String(workingCopyOpfsRecord.cacheJson));
+        await enqueueAppPut(WORK_CACHE_KEY,String(workingCopyOpfsRecord.cacheJson));
+    }
+}
+async function persistWorkingCopyNow(snapshot=state){
+    const normalized=normalizeState(snapshot);
+    const json=JSON.stringify(normalized);
+    appCache.set(WORK_CACHE_KEY,json);
+    const idbPromise=enqueueAppPut(WORK_CACHE_KEY,json);
+    const opfsPromise=queueWorkingCopyOpfsWrite(normalized);
+    const results=await Promise.allSettled([idbPromise,opfsPromise]);
+    if(results[0].status==='rejected')throw results[0].reason||new Error('IndexedDB 工作副本写入失败');
+    return normalized;
+}
+function saveWorkingCache(){
+    const normalized=normalizeState(state);
+    const json=JSON.stringify(normalized);
+    appCache.set(WORK_CACHE_KEY,json);
+    enqueueAppPut(WORK_CACHE_KEY,json).catch(error=>console.error('IndexedDB 工作副本写入失败',error));
+    queueWorkingCopyOpfsWrite(normalized);
+    return true;
+}
+function loadWorkingCache(){
+    try{return normalizeState(JSON.parse(appGet(WORK_CACHE_KEY)||'[]'));}catch(error){return [];}
+}
+function savePublicCache(){
+    const normalized=normalizeState(state);
+    const json=JSON.stringify(normalized);
+    appCache.set(PUBLIC_CACHE_KEY,json);
+    enqueueAppPut(PUBLIC_CACHE_KEY,json).catch(error=>console.error('公开缓存写入失败',error));
+    return true;
+}
+function loadPublicCache(){
+    try{return normalizeState(JSON.parse(appGet(PUBLIC_CACHE_KEY)||'[]'));}catch(error){return [];}
 }
 function show(msg,type='info'){
     toast.textContent=msg;
@@ -1395,43 +1483,47 @@ function formatError(error){
 // ---------- 本地配置与锁定 ----------
 function loadConfig(){
     let saved={};
-    try{saved=JSON.parse(localGet(CONFIG_KEY)||'{}')||{}}catch(e){}
+    try{saved=JSON.parse(appGet(CONFIG_KEY)||'{}')||{};}catch(error){}
     config.owner=clean(saved.owner);
     config.repo=clean(saved.repo);
     config.file=clean(saved.file)||'test_data.json';
-    config.token=clean(localGet(TOKEN_LOCAL_KEY)||sessionGet(TOKEN_SESSION_KEY)||'');
+    config.token=clean(appGet(TOKEN_KEY)||'');
 }
-function saveConfig(){
-    localSet(CONFIG_KEY,JSON.stringify({
-        owner:config.owner,
-        repo:config.repo,
-        file:config.file
-    }));
-    if(rememberToken.checked){
-        localSet(TOKEN_LOCAL_KEY,config.token);
-        removeStored(TOKEN_SESSION_KEY,'session');
-    }else{
-        sessionSet(TOKEN_SESSION_KEY,config.token);
-        removeStored(TOKEN_LOCAL_KEY,'local');
-    }
+async function saveConfig(){
+    const jobs=[
+        appSet(CONFIG_KEY,JSON.stringify({
+            owner:config.owner,
+            repo:config.repo,
+            file:config.file
+        }))
+    ];
+    if(rememberToken.checked)jobs.push(appSet(TOKEN_KEY,config.token));
+    else jobs.push(appDelete(TOKEN_KEY));
+    const results=await Promise.allSettled(jobs);
+    const failed=results.find(result=>result.status==='rejected');
+    if(failed)throw failed.reason||new Error('配置持久化失败');
 }
 function loadMeta(){
     try{
-        const x=JSON.parse(localGet(META_KEY)||'{}')||{};
+        const x=JSON.parse(appGet(META_KEY)||'{}')||{};
         meta={
             target:clean(x.target),
             fingerprint:typeof x.fingerprint==='string'?x.fingerprint:null,
             sha:clean(x.sha)||null,
             lastSyncAt:clean(x.lastSyncAt)||null
         };
-    }catch(e){
+    }catch(error){
         meta={target:'',fingerprint:null,sha:null,lastSyncAt:null};
     }
 }
-function saveMeta(){localSet(META_KEY,JSON.stringify(meta))}
-function saveCache(){localSet(CACHE_KEY,JSON.stringify(normalizeState(state)))}
+function saveMeta(){
+    return appSet(META_KEY,JSON.stringify(meta)).catch(error=>console.error('同步元数据写入失败',error));
+}
+function saveCache(){
+    return unlocked?saveWorkingCache():savePublicCache();
+}
 function loadCache(){
-    try{return normalizeState(JSON.parse(localGet(CACHE_KEY)||'[]'))}catch(e){return []}
+    return loadWorkingCache();
 }
 function record(snapshot,sha){
     meta={
@@ -1455,6 +1547,300 @@ function setUnlocked(on){
     importBtn.disabled=!unlocked;
     exportBtn.disabled=!publicLoaded&&!unlocked;
     configBtn.textContent=unlocked?'配置':'编辑登录';
+    if(unlocked){
+        if(addDraftTimer===null)startAddDraftAutosave();
+    }else{
+        stopAddDraftAutosave();
+        stopEditDraftAutosave();
+    }
+}
+
+// ---------- IndexedDB + OPFS 草稿 ----------
+function draftRecordValid(record){
+    return !!record&&typeof record==='object'&&['draft','tombstone'].includes(record.kind)&&Number(record.savedAt)>0;
+}
+function openDraftDb(){
+    return new Promise((resolve,reject)=>{
+        if(!('indexedDB' in window)){reject(new Error('IndexedDB unavailable'));return;}
+        const request=indexedDB.open(DRAFT_DB_NAME,DRAFT_DB_VERSION);
+        request.onupgradeneeded=()=>{
+            const db=request.result;
+            if(!db.objectStoreNames.contains(DRAFT_STORE))db.createObjectStore(DRAFT_STORE,{keyPath:'key'});
+        };
+        request.onsuccess=()=>resolve(request.result);
+        request.onerror=()=>reject(request.error||new Error('IndexedDB open failed'));
+    });
+}
+async function draftDbRead(key){
+    const db=await openDraftDb();
+    try{
+        return await new Promise((resolve,reject)=>{
+            const tx=db.transaction(DRAFT_STORE,'readonly');
+            const req=tx.objectStore(DRAFT_STORE).get(key);
+            req.onsuccess=()=>resolve(req.result?.record||null);
+            req.onerror=()=>reject(req.error||new Error('IndexedDB read failed'));
+        });
+    }finally{db.close();}
+}
+async function draftDbWrite(key,record){
+    const db=await openDraftDb();
+    try{
+        await new Promise((resolve,reject)=>{
+            const tx=db.transaction(DRAFT_STORE,'readwrite');
+            tx.objectStore(DRAFT_STORE).put({key,record});
+            tx.oncomplete=()=>resolve();
+            tx.onerror=()=>reject(tx.error||new Error('IndexedDB write failed'));
+            tx.onabort=()=>reject(tx.error||new Error('IndexedDB write aborted'));
+        });
+    }finally{db.close();}
+}
+async function draftOpfsRead(fileName){
+    if(!navigator.storage?.getDirectory)return null;
+    try{
+        const root=await navigator.storage.getDirectory();
+        const handle=await root.getFileHandle(fileName);
+        const file=await handle.getFile();
+        const record=JSON.parse(await file.text());
+        return draftRecordValid(record)?record:null;
+    }catch(error){return null;}
+}
+async function draftOpfsWrite(fileName,record){
+    if(!navigator.storage?.getDirectory)return false;
+    try{
+        const root=await navigator.storage.getDirectory();
+        const handle=await root.getFileHandle(fileName,{create:true});
+        const writable=await handle.createWritable();
+        await writable.write(JSON.stringify(record));
+        await writable.close();
+        return true;
+    }catch(error){
+        console.warn('OPFS 草稿写入失败',error);
+        return false;
+    }
+}
+async function requestPersistentDraftStorage(){
+    try{if(navigator.storage?.persist)await navigator.storage.persist();}catch(error){}
+}
+async function readBestDraftRecord(key,fileName){
+    let dbRecord=null,opfsRecord=null;
+    try{dbRecord=await draftDbRead(key);}catch(error){console.warn('IndexedDB 草稿读取失败',error);}
+    opfsRecord=await draftOpfsRead(fileName);
+    const records=[dbRecord,opfsRecord].filter(draftRecordValid).sort((a,b)=>Number(b.savedAt)-Number(a.savedAt));
+    return records[0]||null;
+}
+function enqueueDraftWrite(key,fileName,record){
+    draftWriteChain=draftWriteChain.catch(()=>{}).then(async()=>{
+        const results=await Promise.allSettled([
+            draftDbWrite(key,record),
+            draftOpfsWrite(fileName,record)
+        ]);
+        const dbOk=results[0].status==='fulfilled';
+        const opfsOk=results[1].status==='fulfilled'&&results[1].value!==false;
+        if(!dbOk&&!opfsOk)throw new Error('草稿本地持久化失败');
+    });
+    return draftWriteChain;
+}
+function dataUrlFromFile(file){
+    return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(String(reader.result||''));
+        reader.onerror=()=>reject(reader.error||new Error('读取待上传图片失败'));
+        reader.readAsDataURL(file);
+    });
+}
+async function serializePendingImages(editor){
+    const result=[];
+    const map=pendingMap(editor);
+    for(const [token,pending] of map){
+        let dataUrl=String(pending.draftDataUrl||'');
+        if(!dataUrl){
+            dataUrl=await dataUrlFromFile(pending.file);
+            pending.draftDataUrl=dataUrl;
+        }
+        result.push({
+            token,
+            name:String(pending.file?.name||'image'),
+            type:String(pending.file?.type||'application/octet-stream'),
+            lastModified:Number(pending.file?.lastModified)||Date.now(),
+            dataUrl
+        });
+    }
+    return result;
+}
+async function restorePendingImages(editor,items){
+    clearPendingUploads(editor);
+    const map=pendingMap(editor);
+    const validTokens=new Set();
+    for(const item of Array.isArray(items)?items:[]){
+        const token=String(item?.token||'');
+        const dataUrl=String(item?.dataUrl||'');
+        if(!/^img_[a-z0-9_-]+$/i.test(token)||!/^data:image\//i.test(dataUrl))continue;
+        try{
+            const blob=await (await fetch(dataUrl)).blob();
+            const file=new File([blob],String(item.name||'image'),{
+                type:String(item.type||blob.type||'image/*'),
+                lastModified:Number(item.lastModified)||Date.now()
+            });
+            const previewUrl=URL.createObjectURL(file);
+            map.set(token,{file,previewUrl,draftDataUrl:dataUrl});
+            validTokens.add(token);
+            const node=[...editor.querySelectorAll('img[data-upload-token]')].find(img=>img.getAttribute('data-upload-token')===token);
+            if(node)node.setAttribute('src',previewUrl);
+        }catch(error){console.warn('恢复待上传图片失败',error);}
+    }
+    for(const img of [...editor.querySelectorAll('img[data-upload-token]')]){
+        const token=img.getAttribute('data-upload-token')||'';
+        if(!validTokens.has(token))img.remove();
+    }
+}
+function addDraftSnapshot(){
+    return JSON.stringify({
+        title:selectedTitle(titleOptions),
+        content:getEditorHtml(contentInput),
+        pendingTokens:[...pendingMap(contentInput).keys()].sort()
+    });
+}
+function editDraftSnapshot(){
+    return JSON.stringify({
+        editingId:String(editingId||''),
+        title:selectedTitle(editTitleOptions),
+        content:getEditorHtml(editContent),
+        pendingTokens:[...pendingMap(editContent).keys()].sort()
+    });
+}
+function addDraftHasChanges(){
+    const empty=JSON.stringify({title:'',content:'',pendingTokens:[]});
+    return addDraftSnapshot()!==empty;
+}
+function editDraftHasChanges(){
+    return !!editingId&&editSnapshot()!==editInitialSnapshot;
+}
+async function buildAddDraftRecord(){
+    const draft={
+        version:1,mode:'add',title:selectedTitle(titleOptions),
+        content:getEditorHtml(contentInput),
+        pendingImages:await serializePendingImages(contentInput),
+        savedAt:Date.now()
+    };
+    return{kind:'draft',savedAt:draft.savedAt,draft};
+}
+async function buildEditDraftRecord(){
+    const draft={
+        version:1,mode:'edit',editingId:String(editingId||''),
+        title:selectedTitle(editTitleOptions),
+        content:getEditorHtml(editContent),
+        pendingImages:await serializePendingImages(editContent),
+        savedAt:Date.now()
+    };
+    return{kind:'draft',savedAt:draft.savedAt,draft};
+}
+async function saveAddDraftLocal(force=false){
+    if(!unlocked)return false;
+    if(!addDraftHasChanges()){
+        if(addDraftLastSnapshot){await clearAddDraft();}
+        return false;
+    }
+    const snapshot=addDraftSnapshot();
+    if(!force&&snapshot===addDraftLastSnapshot)return true;
+    try{
+        const record=await buildAddDraftRecord();
+        addDraftLastSnapshot=snapshot;
+        await enqueueDraftWrite(ADD_DRAFT_KEY,ADD_DRAFT_OPFS_FILE,record);
+        return true;
+    }catch(error){console.error('新增草稿自动保存失败',error);return false;}
+}
+async function saveEditDraftLocal(force=false){
+    if(editModal.classList.contains('hidden')||!editingId)return false;
+    if(!editDraftHasChanges()){
+        if(editDraftLastSnapshot){await clearEditDraft();}
+        return false;
+    }
+    const snapshot=editDraftSnapshot();
+    if(!force&&snapshot===editDraftLastSnapshot)return true;
+    try{
+        const record=await buildEditDraftRecord();
+        editDraftLastSnapshot=snapshot;
+        await enqueueDraftWrite(EDIT_DRAFT_KEY,EDIT_DRAFT_OPFS_FILE,record);
+        return true;
+    }catch(error){console.error('编辑草稿自动保存失败',error);return false;}
+}
+function markAddDraftChanged(){
+    if(!unlocked)return;
+    clearTimeout(addDraftInputTimer);
+    addDraftInputTimer=setTimeout(()=>saveAddDraftLocal(false),DRAFT_LOCAL_DEBOUNCE);
+}
+function markEditDraftChanged(){
+    if(editModal.classList.contains('hidden')||!editingId)return;
+    clearTimeout(editDraftInputTimer);
+    editDraftInputTimer=setTimeout(()=>saveEditDraftLocal(false),DRAFT_LOCAL_DEBOUNCE);
+}
+function startAddDraftAutosave(){
+    stopAddDraftAutosave();
+    addDraftTimer=setInterval(()=>saveAddDraftLocal(true),DRAFT_INTERVAL);
+}
+function stopAddDraftAutosave(){
+    if(addDraftTimer!==null){clearInterval(addDraftTimer);addDraftTimer=null;}
+    clearTimeout(addDraftInputTimer);addDraftInputTimer=null;
+}
+function startEditDraftAutosave(){
+    stopEditDraftAutosave();
+    editDraftTimer=setInterval(()=>saveEditDraftLocal(true),DRAFT_INTERVAL);
+}
+function stopEditDraftAutosave(){
+    if(editDraftTimer!==null){clearInterval(editDraftTimer);editDraftTimer=null;}
+    clearTimeout(editDraftInputTimer);editDraftInputTimer=null;
+}
+function clearAddDraft(){
+    addDraftLastSnapshot='';
+    return enqueueDraftWrite(ADD_DRAFT_KEY,ADD_DRAFT_OPFS_FILE,{kind:'tombstone',savedAt:Date.now()})
+        .catch(error=>console.warn('新增草稿清除标记写入失败',error));
+}
+function clearEditDraft(){
+    editDraftLastSnapshot='';
+    return enqueueDraftWrite(EDIT_DRAFT_KEY,EDIT_DRAFT_OPFS_FILE,{kind:'tombstone',savedAt:Date.now()})
+        .catch(error=>console.warn('编辑草稿清除标记写入失败',error));
+}
+async function applyAddDraft(draft){
+    setSelectedTitle(titleOptions,draft?.title||'');
+    setEditorHtml(contentInput,String(draft?.content??''));
+    await restorePendingImages(contentInput,draft?.pendingImages||[]);
+    addDraftLastSnapshot=addDraftSnapshot();
+    contentInput.dispatchEvent(new Event('editor-scroll-refresh'));
+}
+async function applyEditDraft(draft){
+    const id=String(draft?.editingId||'');
+    if(!id||!state.some(item=>item.id===id))return false;
+    openEdit(id);
+    setSelectedTitle(editTitleOptions,draft?.title||'');
+    setEditorHtml(editContent,String(draft?.content??''));
+    await restorePendingImages(editContent,draft?.pendingImages||[]);
+    editDraftLastSnapshot=editDraftSnapshot();
+    editContent.dispatchEvent(new Event('editor-scroll-refresh'));
+    return true;
+}
+async function restoreTestDraftsIfAny(){
+    if(!unlocked||draftsRestoredThisSession)return false;
+    draftsRestoredThisSession=true;
+    const [addRecord,editRecord]=await Promise.all([
+        readBestDraftRecord(ADD_DRAFT_KEY,ADD_DRAFT_OPFS_FILE),
+        readBestDraftRecord(EDIT_DRAFT_KEY,EDIT_DRAFT_OPFS_FILE)
+    ]);
+    let restoredAdd=false,restoredEdit=false;
+    if(addRecord?.kind==='draft'&&addRecord.draft?.mode==='add'){
+        await applyAddDraft(addRecord.draft);
+        restoredAdd=true;
+    }
+    if(editRecord?.kind==='draft'&&editRecord.draft?.mode==='edit'){
+        restoredEdit=await applyEditDraft(editRecord.draft);
+        if(!restoredEdit&&!restoredAdd){
+            await applyAddDraft({...editRecord.draft,mode:'add'});
+            restoredAdd=true;
+        }
+    }
+    if(restoredAdd&&restoredEdit)show('已恢复上次未提交的新增草稿和编辑草稿','info');
+    else if(restoredEdit)show('已恢复上次未提交的编辑草稿','info');
+    else if(restoredAdd)show('已恢复上次未提交的草稿','info');
+    return restoredAdd||restoredEdit;
 }
 
 // ---------- 公开只读数据 ----------
@@ -1493,7 +1879,7 @@ async function loadPublicView(){
         console.error(error);
 
         // 已访问过的设备可退回最近一次缓存；新访客则显示明确错误。
-        const cached=loadCache();
+        const cached=loadPublicCache();
         state=cached;
         publicLoaded=cached.length>0;
         render();
@@ -1505,7 +1891,7 @@ async function loadPublicView(){
         }else{
             exportBtn.disabled=true;
             status('offline','公开数据不可用');
-            lastSyncTime.textContent='无法加载 test_data.json · 编辑登录仍可使用';
+            lastSyncTime.textContent='无法加载 cards_data.json · 编辑登录仍可使用';
             cardsList.innerHTML='<div class="empty-state">暂时无法加载公开 Test，请稍后刷新。</div>';
         }
         return false;
@@ -1584,7 +1970,7 @@ async function readRemote(){
 }
 async function writeRemote(snapshot,sha){
     const normalized=normalizeState(snapshot);
-    const raw=JSON.stringify({schemaVersion:4,entries:normalized},null,2);
+    const raw=JSON.stringify({schemaVersion:6,entries:normalized},null,2);
     if(new TextEncoder().encode(raw).length>MAX_BYTES){
         throw new Error('数据超过 750 KB');
     }
@@ -1609,7 +1995,11 @@ function safeAttachmentName(name){
     const safe=raw.replace(/^\.+/,'').slice(-120)||'image';
     return `${Date.now()}_${Math.random().toString(36).slice(2,8)}_${safe}`;
 }
-function attachmentRepoPath(code,name){return [attachmentBaseDir(),String(code),name].filter(Boolean).join('/');}
+function attachmentRepoPath(folder,name){
+    const valid=normalizeAttachmentFolder(folder);
+    if(valid===null)throw new Error('图片附件缺少有效的 10 位 Unix 时间戳目录');
+    return [attachmentBaseDir(),String(valid),name].filter(Boolean).join('/');
+}
 function attachmentPublicSrc(repoPath){return './'+String(repoPath).split('/').filter(Boolean).map(encodeURIComponent).join('/');}
 function fileToBase64(file){
     return new Promise((resolve,reject)=>{
@@ -1624,11 +2014,11 @@ function fileToBase64(file){
         reader.readAsDataURL(file);
     });
 }
-async function uploadAttachment(code,file){
+async function uploadAttachment(folder,file){
     const name=safeAttachmentName(file.name);
-    const repoPath=attachmentRepoPath(code,name);
+    const repoPath=attachmentRepoPath(folder,name);
     const result=await githubApi('PUT',`contents/${pathEncode(repoPath)}`,{
-        message:`上传 Test ${code} 附件 ${name}`,
+        message:`上传 Test 附件 ${name}`,
         content:await fileToBase64(file)
     });
     if(!result?.content?.sha)throw new Error(`图片上传失败：${file.name}`);
@@ -1645,54 +2035,10 @@ async function deleteRepoTree(repoPath){
         }
     }
 }
-async function deleteAttachmentFolder(code){
-    const valid=Number.parseInt(String(code??''),10);
-    if(!Number.isInteger(valid)||!SUBJECTS.some(name=>{const [start,end]=SUBJECT_CODE_RANGES[name];return valid>=start&&valid<=end;}))return;
+async function deleteAttachmentFolder(folder){
+    const valid=normalizeAttachmentFolder(folder);
+    if(valid===null)return;
     await deleteRepoTree([attachmentBaseDir(),String(valid)].filter(Boolean).join('/'));
-}
-async function repoPathExists(repoPath){
-    try{await githubApi('GET',`contents/${pathEncode(repoPath)}`);return true;}catch(error){if(error.status===404)return false;throw error;}
-}
-async function copyRepoTree(sourcePath,targetPath){
-    let data;
-    try{data=await githubApi('GET',`contents/${pathEncode(sourcePath)}`);}catch(error){if(error.status===404)return false;throw error;}
-    if(await repoPathExists(targetPath))throw new Error(`目标附件目录 ${targetPath} 已存在，请先清理后重试`);
-    async function copyNode(node,target){
-        if(Array.isArray(node)){
-            for(const item of node)await copyNode(item,[target,item.name].filter(Boolean).join('/'));
-            return;
-        }
-        if(node?.type==='dir'){
-            const children=await githubApi('GET',`contents/${pathEncode(node.path)}`);
-            for(const item of children||[])await copyNode(item,[target,item.name].filter(Boolean).join('/'));
-            return;
-        }
-        if(node?.type==='file'){
-            const fileData=(typeof node.content==='string')?node:await githubApi('GET',`contents/${pathEncode(node.path)}`);
-            if(typeof fileData?.content!=='string')throw new Error(`无法读取附件 ${node.path}`);
-            await githubApi('PUT',`contents/${pathEncode(target)}`,{message:`迁移 Test 附件 ${node.path}`,content:String(fileData.content).replace(/\s/g,'')});
-        }
-    }
-    const items=Array.isArray(data)?data:[data];
-    for(const item of items)await copyNode(item,[targetPath,item.name].filter(Boolean).join('/'));
-    return true;
-}
-async function migrateAttachmentFolder(oldCode,newCode){
-    if(String(oldCode)===String(newCode))return false;
-    const base=attachmentBaseDir();
-    const oldPath=[base,String(oldCode)].filter(Boolean).join('/');
-    const newPath=[base,String(newCode)].filter(Boolean).join('/');
-    const copied=await copyRepoTree(oldPath,newPath);
-    if(copied)await deleteRepoTree(oldPath);
-    return copied;
-}
-function rewriteEditorAttachmentCode(editor,oldCode,newCode){
-    const oldSegment=`/${oldCode}/`;
-    const newSegment=`/${newCode}/`;
-    editor.querySelectorAll('img:not([data-pending-id])').forEach(img=>{
-        const src=img.getAttribute('src')||'';
-        if(src.includes(oldSegment))img.setAttribute('src',src.replace(oldSegment,newSegment));
-    });
 }
 
 // ---------- 渲染 ----------
@@ -1709,13 +2055,11 @@ function render(){
     }
 
     cardsList.innerHTML=state.map(item=>`
-        <article class="cards-item" data-code="${item.code}">
+        <article class="cards-item" data-id="${attr(item.id)}">
             ${item.title?`<h3 class="cards-title">${esc(item.title)}</h3>`:''}
             <div class="cards-content">${renderMarkdownLinks(item.content)}</div>
             <div class="cards-footer">
-                <div class="cards-meta-left">
-                    <div class="cards-code">${esc(item.subject)}${esc(item.code)}</div>
-                </div>
+                <div class="cards-code">${esc(unixCodeFromCreatedAt(item.createdAt))}</div>
                 ${unlocked?`<div class="item-actions"><button class="action-btn edit-btn" data-id="${attr(item.id)}" type="button">编辑</button></div>`:''}
             </div>
         </article>
@@ -1779,6 +2123,7 @@ async function login(showResult=true){
             if(showResult)show('Token 验证成功，已启用编辑','success');
         }
 
+        await restoreTestDraftsIfAny();
         return true;
     }catch(error){
         console.error(error);
@@ -1927,7 +2272,9 @@ function markLocalChange(){
 // ---------- 富文本编辑 ----------
 function selectionInside(editor){
     const sel=window.getSelection();
-    return sel&&sel.rangeCount>0&&editor.contains(sel.anchorNode);
+    if(!sel||sel.rangeCount===0)return false;
+    const range=sel.getRangeAt(0);
+    return editor.contains(range.startContainer)&&editor.contains(range.endContainer);
 }
 function currentBlock(editor){
     const sel=window.getSelection();
@@ -1949,14 +2296,253 @@ function ensureEditorSelection(editor){
     sel.removeAllRanges();
     sel.addRange(range);
 }
-function toggleFirstLineIndent(editor){
-    ensureEditorSelection(editor);
-    let block=currentBlock(editor);
-    if(!block||block.tagName==='LI'||block.tagName==='BLOCKQUOTE'){
-        document.execCommand('formatBlock',false,'p');
-        block=currentBlock(editor);
+function rememberEditorRange(editor){
+    const sel=window.getSelection();
+    if(!sel||sel.rangeCount===0)return false;
+    const range=sel.getRangeAt(0);
+    if(!editor.contains(range.startContainer)||!editor.contains(range.endContainer))return false;
+    savedEditorRanges.set(editor,range.cloneRange());
+    return true;
+}
+function restoreEditorRange(editor){
+    editor.focus({preventScroll:true});
+    const range=savedEditorRanges.get(editor);
+    if(!range)return ensureEditorSelection(editor);
+    try{
+        if(!editor.contains(range.startContainer)||!editor.contains(range.endContainer))throw new Error('stale range');
+        const sel=window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range.cloneRange());
+    }catch(error){
+        savedEditorRanges.delete(editor);
+        ensureEditorSelection(editor);
     }
-    if(block)block.classList.toggle('first-line-indent');
+}
+function createEditorParagraph(inheritIndent=false){
+    const block=document.createElement('div');
+    block.classList.add('editor-paragraph');
+    if(inheritIndent)block.classList.add('first-line-indent');
+    return block;
+}
+function tagNestedEditorParagraphs(container){
+    for(const block of container.querySelectorAll('p,div')){
+        // 只把最内层 P/DIV 视为一个自然段，避免把包裹多个段落的容器误当成单段。
+        if(block.querySelector(':scope > p,:scope > div'))continue;
+        block.classList.add('editor-paragraph');
+    }
+}
+function normalizeEditorParagraphModel(editor){
+    // contenteditable 的顶层 DOM 由浏览器决定：可能是裸文本、DIV、P、BR，
+    // 甚至会出现“DIV 内再嵌 DIV”的段落结构。首行缩进不能依赖这些偶然结构。
+    // 这里把普通正文统一成顶层 DIV.editor-paragraph；列表、引用、表格等结构块原样保留。
+    const source=[...editor.childNodes];
+    if(!source.length)return;
+
+    const output=document.createDocumentFragment();
+    let paragraph=null;
+    let paragraphInheritedIndent=false;
+
+    const ensureParagraph=(inheritIndent=false)=>{
+        if(!paragraph){
+            paragraph=createEditorParagraph(inheritIndent);
+            paragraphInheritedIndent=inheritIndent;
+        }else if(inheritIndent&&!paragraphInheritedIndent){
+            paragraph.classList.add('first-line-indent');
+            paragraphInheritedIndent=true;
+        }
+        return paragraph;
+    };
+    const flush=(forceBlank=false)=>{
+        if(!paragraph&&forceBlank)paragraph=createEditorParagraph(false);
+        if(!paragraph)return;
+        if(!paragraph.childNodes.length)paragraph.appendChild(document.createElement('br'));
+        output.appendChild(paragraph);
+        paragraph=null;
+        paragraphInheritedIndent=false;
+    };
+    const appendDirectText=(node,inheritIndent=false)=>{
+        const value=String(node.nodeValue??'').replace(/\r\n?/g,'\n');
+        if(!value.includes('\n')){
+            ensureParagraph(inheritIndent).appendChild(node);
+            return;
+        }
+        const parts=value.split('\n');
+        node.remove();
+        parts.forEach((part,index)=>{
+            if(part)ensureParagraph(inheritIndent).appendChild(document.createTextNode(part));
+            // 文本节点中的换行在 contenteditable 中同样可能代表自然段边界。
+            if(index<parts.length-1)flush(true);
+        });
+    };
+
+    const processNodes=(nodes,inheritIndent=false)=>{
+        for(const node of nodes){
+            if(node.nodeType===Node.TEXT_NODE){
+                appendDirectText(node,inheritIndent);
+                continue;
+            }
+            if(node.nodeType!==Node.ELEMENT_NODE){
+                node.remove();
+                continue;
+            }
+
+            const tag=node.tagName.toUpperCase();
+            if(tag==='BR'){
+                node.remove();
+                flush(true);
+                continue;
+            }
+
+            if(tag==='P'){
+                flush();
+                const block=createEditorParagraph(inheritIndent||node.classList.contains('first-line-indent'));
+                while(node.firstChild)block.appendChild(node.firstChild);
+                if(!block.childNodes.length)block.appendChild(document.createElement('br'));
+                node.remove();
+                output.appendChild(block);
+                continue;
+            }
+
+            if(tag==='DIV'){
+                const nestedParagraphs=[...node.children].some(child=>child.tagName==='P'||child.tagName==='DIV');
+                if(nestedParagraphs){
+                    // 浏览器有时把多个自然段嵌套进一个 DIV；把这个容器展开成真正的兄弟段落。
+                    flush();
+                    const children=[...node.childNodes];
+                    const nextIndent=inheritIndent||node.classList.contains('first-line-indent');
+                    node.remove();
+                    processNodes(children,nextIndent);
+                }else{
+                    flush();
+                    node.classList.add('editor-paragraph');
+                    if(inheritIndent)node.classList.add('first-line-indent');
+                    if(!node.childNodes.length)node.appendChild(document.createElement('br'));
+                    output.appendChild(node);
+                }
+                continue;
+            }
+
+            if(['UL','OL','BLOCKQUOTE','TABLE','HR'].includes(tag)){
+                flush();
+                tagNestedEditorParagraphs(node);
+                output.appendChild(node);
+                continue;
+            }
+
+            // B/I/U/SPAN/IMG 等行内内容归入当前自然段。
+            ensureParagraph(inheritIndent).appendChild(node);
+        }
+    };
+
+    processNodes(source,false);
+    flush();
+    editor.replaceChildren(output);
+}
+function createSelectionMarker(kind){
+    const marker=document.createElement('span');
+    marker.dataset.editorSelectionMarker=kind;
+    marker.setAttribute('aria-hidden','true');
+    marker.style.cssText='display:inline-block;width:0;height:0;overflow:hidden;line-height:0;pointer-events:none;';
+    return marker;
+}
+function insertSelectionMarkers(editor,range){
+    const collapsed=range.collapsed;
+    const startMarker=createSelectionMarker('start');
+    const endMarker=collapsed?null:createSelectionMarker('end');
+
+    if(endMarker){
+        const endRange=range.cloneRange();
+        endRange.collapse(false);
+        endRange.insertNode(endMarker);
+    }
+    const startRange=range.cloneRange();
+    startRange.collapse(true);
+    startRange.insertNode(startMarker);
+    return{startMarker,endMarker,collapsed};
+}
+function restoreSelectionFromMarkers(editor,bookmark){
+    const{startMarker,endMarker,collapsed}=bookmark;
+    const sel=window.getSelection();
+    if(!sel||!startMarker.isConnected)return false;
+    const range=document.createRange();
+    if(collapsed){
+        range.setStartBefore(startMarker);
+        range.collapse(true);
+    }else if(endMarker?.isConnected){
+        range.setStartAfter(startMarker);
+        range.setEndBefore(endMarker);
+    }else return false;
+
+    sel.removeAllRanges();
+    sel.addRange(range);
+    // Range 是 live range；移除标记后边界会自动贴回相邻真实内容。
+    startMarker.remove();
+    endMarker?.remove();
+    editor.normalize();
+    return true;
+}
+function normalizeEditorParagraphModelPreservingSelection(editor){
+    const sel=window.getSelection();
+    if(!sel||sel.rangeCount===0||!selectionInside(editor)){
+        normalizeEditorParagraphModel(editor);
+        return false;
+    }
+    const bookmark=insertSelectionMarkers(editor,sel.getRangeAt(0).cloneRange());
+    normalizeEditorParagraphModel(editor);
+    return restoreSelectionFromMarkers(editor,bookmark);
+}
+function editorParagraphForNode(editor,node){
+    let current=node?.nodeType===Node.ELEMENT_NODE?node:node?.parentElement;
+    while(current&&current!==editor){
+        if(current.nodeType===Node.ELEMENT_NODE&&current.classList.contains('editor-paragraph'))return current;
+        current=current.parentElement;
+    }
+    return null;
+}
+function paragraphsTouchedByBookmark(editor,bookmark){
+    const{startMarker,endMarker,collapsed}=bookmark;
+    const paragraphs=[...editor.querySelectorAll('.editor-paragraph')];
+    if(collapsed){
+        const block=editorParagraphForNode(editor,startMarker);
+        return block?[block]:[];
+    }
+    if(!endMarker?.isConnected)return[];
+
+    const startBlock=editorParagraphForNode(editor,startMarker);
+    const endBlock=editorParagraphForNode(editor,endMarker);
+    if(!startBlock||!endBlock)return[];
+    const startIndex=paragraphs.indexOf(startBlock);
+    const endIndex=paragraphs.indexOf(endBlock);
+    if(startIndex<0||endIndex<0)return[];
+    const from=Math.min(startIndex,endIndex);
+    const to=Math.max(startIndex,endIndex);
+    return paragraphs.slice(from,to+1);
+}
+function toggleFirstLineIndent(editor){
+    restoreEditorRange(editor);
+    const sel=window.getSelection();
+    if(!sel||sel.rangeCount===0||!selectionInside(editor)){
+        show('请将光标放在正文段落中，或选择一个/多个自然段','info');
+        return;
+    }
+
+    // 先在真实选区两端插入标记，再重建段落模型。标记会随文字一起移动，
+    // 因而不依赖浏览器点击工具栏后是否仍保留原 Range。
+    const bookmark=insertSelectionMarkers(editor,sel.getRangeAt(0).cloneRange());
+    normalizeEditorParagraphModel(editor);
+    const blocks=paragraphsTouchedByBookmark(editor,bookmark);
+    if(!blocks.length){
+        restoreSelectionFromMarkers(editor,bookmark);
+        show('没有识别到可缩进的自然段','info');
+        return;
+    }
+
+    const shouldIndent=blocks.some(block=>!block.classList.contains('first-line-indent'));
+    for(const block of blocks)block.classList.toggle('first-line-indent',shouldIndent);
+
+    restoreSelectionFromMarkers(editor,bookmark);
+    editor.dispatchEvent(new Event('input',{bubbles:true}));
+    rememberEditorRange(editor);
 }
 function toggleQuote(editor){
     ensureEditorSelection(editor);
@@ -1964,16 +2550,6 @@ function toggleQuote(editor){
     document.execCommand('formatBlock',false,block?.tagName==='BLOCKQUOTE'?'p':'blockquote');
 }
 function editorImageInput(editor){return editor===editContent?editImageInput:contentImageInput;}
-function rememberEditorRange(editor){
-    const sel=window.getSelection();
-    if(sel&&sel.rangeCount>0&&editor.contains(sel.anchorNode))savedEditorRanges.set(editor,sel.getRangeAt(0).cloneRange());
-}
-function restoreEditorRange(editor){
-    editor.focus();
-    const range=savedEditorRanges.get(editor);
-    if(!range)return ensureEditorSelection(editor);
-    const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
-}
 function pendingMap(editor){let map=pendingUploads.get(editor);if(!map){map=new Map();pendingUploads.set(editor,map);}return map;}
 function clearPendingUploads(editor){
     const map=pendingMap(editor);
@@ -2005,37 +2581,57 @@ function insertTable(editor){
     for(let r=0;r<rows;r++){html+='<tr>';for(let c=0;c<cols;c++)html+=r===0?'<th>&nbsp;</th>':'<td>&nbsp;</td>';html+='</tr>';}
     html+='</tbody></table><p><br></p>';document.execCommand('insertHTML',false,html);editor.dispatchEvent(new Event('input',{bubbles:true}));
 }
-async function resolvePendingImages(editor,code){
+function hasPendingImages(editor){
+    return Boolean(editor.querySelector('img[data-upload-token]'));
+}
+async function resolvePendingImages(editor,folder){
     const map=pendingMap(editor);const nodes=[...editor.querySelectorAll('img[data-upload-token]')];
+    if(nodes.length&&normalizeAttachmentFolder(folder)===null)throw new Error('无法分配图片附件目录');
     for(const img of nodes){
         const token=img.getAttribute('data-upload-token');const pending=map.get(token);
         if(!pending)throw new Error('有图片尚未准备完成，请重新选择该图片');
-        const uploaded=await uploadAttachment(code,pending.file);img.setAttribute('src',uploaded.src);img.removeAttribute('data-upload-token');
+        const uploaded=await uploadAttachment(folder,pending.file);img.setAttribute('src',uploaded.src);img.removeAttribute('data-upload-token');
         try{URL.revokeObjectURL(pending.previewUrl)}catch(e){}map.delete(token);
     }
     return getEditorHtml(editor);
 }
-function insertMathTemplate(editor,display=false){
-    ensureEditorSelection(editor);
+function insertMathMarkup(editor,display=false){
+    editor.focus();
     const sel=window.getSelection();
-    const selected=sel&&sel.rangeCount>0&&editor.contains(sel.anchorNode)?sel.toString():'';
-    const body=selected||'x';
-    const text=display?`$$${body}$$`:`$${body}$`;
-    document.execCommand('insertText',false,text);
+    let range=null;
+    if(sel&&sel.rangeCount){
+        const candidate=sel.getRangeAt(0);
+        if(editor.contains(candidate.commonAncestorContainer))range=candidate;
+    }
+    if(!range){
+        range=document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+    }
+    const mark=display?'$$':'$';
+    const selected=range.toString();
+    const node=document.createTextNode(mark+selected+mark);
+    range.deleteContents();
+    range.insertNode(node);
+    const caret=document.createRange();
+    if(selected)caret.setStartAfter(node);
+    else caret.setStart(node,mark.length);
+    caret.collapse(true);
+    if(sel){sel.removeAllRanges();sel.addRange(caret);}
     editor.dispatchEvent(new Event('input',{bubbles:true}));
 }
 function runEditorAction(editor,button){
-    ensureEditorSelection(editor);
+    restoreEditorRange(editor);
     const command=button.dataset.command;
     const action=button.dataset.action;
     if(command)document.execCommand(command,false,null);
     else if(action==='indent')toggleFirstLineIndent(editor);
     else if(action==='quote')toggleQuote(editor);
     else if(action==='inlineMath'){
-        insertMathTemplate(editor,false);
+        insertMathMarkup(editor,false);
         return;
     }else if(action==='displayMath'){
-        insertMathTemplate(editor,true);
+        insertMathMarkup(editor,true);
         return;
     }else if(action==='image'){
         rememberEditorRange(editor);
@@ -2153,8 +2749,43 @@ function setupEditorScrollIndicator(editor){
 
 function setupRichEditor(editor,toolbar,imageInput){
     setupEditorScrollIndicator(editor);
-    toolbar.addEventListener('mousedown',event=>{const button=event.target.closest('.editor-btn');if(button)event.preventDefault();});
-    toolbar.addEventListener('click',event=>{const button=event.target.closest('.editor-btn');if(!button)return;runEditorAction(editor,button);});
+
+    // 工具栏点击前先冻结正文选区。pointerdown 覆盖鼠标、触控笔和触屏；
+    // mousedown 仅作为旧浏览器兜底。这样跨段选区不会在点击按钮时被工具栏夺走。
+    const preserveSelection=event=>{
+        const button=event.target.closest('.editor-btn');
+        if(!button)return;
+        rememberEditorRange(editor);
+        event.preventDefault();
+    };
+    toolbar.addEventListener('pointerdown',preserveSelection);
+    toolbar.addEventListener('mousedown',preserveSelection);
+    toolbar.addEventListener('click',event=>{
+        const button=event.target.closest('.editor-btn');
+        if(!button)return;
+        restoreEditorRange(editor);
+        runEditorAction(editor,button);
+    });
+
+    // 用户改变正文选区时持续保存最后一个有效 Range，供工具栏恢复。
+    const saveSelection=()=>rememberEditorRange(editor);
+    editor.addEventListener('pointerup',saveSelection);
+    editor.addEventListener('keyup',saveSelection);
+    editor.addEventListener('touchend',saveSelection,{passive:true});
+    editor.addEventListener('focus',saveSelection);
+    // 移动端拖动系统选区手柄时不一定触发 pointerup/keyup；selectionchange 才是可靠来源。
+    document.addEventListener('selectionchange',()=>{
+        if(selectionInside(editor))rememberEditorRange(editor);
+    });
+
+    // Enter 产生的新段落由浏览器先完成，再立即归一化并保持光标位置。
+    editor.addEventListener('input',event=>{
+        if(event.inputType==='insertParagraph'){
+            normalizeEditorParagraphModelPreservingSelection(editor);
+            rememberEditorRange(editor);
+        }
+    });
+
     imageInput.addEventListener('change',()=>{insertPendingImages(editor,imageInput.files||[]);imageInput.value='';});
     editor.addEventListener('paste',event=>{
         event.preventDefault();
@@ -2162,6 +2793,8 @@ function setupRichEditor(editor,toolbar,imageInput){
         const html=event.clipboardData?.getData('text/html')||'';
         const text=clipboardTextForEditor(plain,html);
         document.execCommand('insertText',false,text);
+        normalizeEditorParagraphModelPreservingSelection(editor);
+        rememberEditorRange(editor);
     });
 }
 setupRichEditor(contentInput,contentToolbar,contentImageInput);
@@ -2170,30 +2803,44 @@ setupRichEditor(editContent,editToolbar,editImageInput);
 // ---------- Test 增删改 ----------
 async function addEntry(){
     if(!unlocked||addBtn.disabled)return;
-    const title=String(titleInput.value??'').trim();
+    const title=selectedTitle(titleOptions);
     const initialContent=getEditorHtml(contentInput);
-    if(!title&&!hasMeaningfulContent(initialContent)){show('请输入标题或内容','error');titleInput.focus();return;}
-    const subject=selectedSubject(subjectOptions);
-    if(!subject){show('请选择科目','error');subjectOptions.querySelector('input')?.focus();return;}
-    let code;try{code=resolveNewEntryCode(codeInput.value,subject);}catch(error){show(error.message||String(error),'error');codeInput.focus();return;}
+    if(!title){show('请选择标题','error');titleOptions.querySelector('input')?.focus();return;}
+    if(!hasMeaningfulContent(initialContent)){show('请输入内容','error');contentInput.focus();return;}
+    const id=uid();
+    const createdAt=new Date().toISOString();
     addBtn.disabled=true;
     try{
-        const content=await resolvePendingImages(contentInput,code);
-        state.push({id:uid(),code,title,subject,source:'',content,contentFormat:'html',createdAt:new Date().toISOString()});
-        titleInput.value='';clearSelectedSubject(subjectOptions);codeInput.value='';contentInput.innerHTML='';clearPendingUploads(contentInput);
-        markLocalChange();titleInput.focus();show(`已提交 · 编码 ${code}`,'success');
+        const attachmentFolder=hasPendingImages(contentInput)?allocateAttachmentFolder():null;
+        const content=await resolvePendingImages(contentInput,attachmentFolder);
+        state.push({
+            id,attachmentFolder,code:unixCodeFromCreatedAt(createdAt),title,source:'',content,contentFormat:'html',createdAt
+        });
+
+        // 与最新版 Blog / Test 一致：正式工作副本先完整落入 IndexedDB + OPFS，随后才清未提交草稿。
+        await persistWorkingCopyNow(state);
+        await clearAddDraft();
+
+        clearSelectedTitle(titleOptions);
+        contentInput.innerHTML='';
+        clearPendingUploads(contentInput);
+        addDraftLastSnapshot=addDraftSnapshot();
+
+        markLocalChange();
+        titleOptions.querySelector('input')?.focus();
+        show(`已提交 · 编码 ${unixCodeFromCreatedAt(createdAt)}`,'success');
     }catch(error){console.error(error);show(`提交失败：${formatError(error)}`,'error');}
     finally{addBtn.disabled=false;}
 }
 function editSnapshot(){
     return JSON.stringify({
-        title:String(editTitle.value??''),
-        subject:selectedSubject(editSubjectOptions),
-        code:String(editCode.value??''),
+        title:selectedTitle(editTitleOptions),
         content:getEditorHtml(editContent)
     });
 }
-function closeEditModal(){
+function closeEditModal(clearDraft=true){
+    stopEditDraftAutosave();
+    if(clearDraft)clearEditDraft();
     clearPendingUploads(editContent);
     editingId='';
     editInitialSnapshot='';
@@ -2205,15 +2852,11 @@ function openEdit(id){
     const item=state.find(x=>x.id===id);
     if(!item)return;
     editingId=id;
-    editTitle.value=item.title||'';
-    setSelectedSubject(editSubjectOptions,item.subject);
-    editCode.value=String(item.code??'');
+    setSelectedTitle(editTitleOptions,item.title);
     setEditorHtml(editContent,item.content);
     editInitialSnapshot=editSnapshot();
     editModal.classList.remove('hidden');
 
-    // editContent 在弹窗隐藏时 clientHeight 为 0；显示后必须重新计算滚动条，
-    // 否则手机端可能有滚动能力但看不到滚动条。
     requestAnimationFrame(()=>{
         requestAnimationFrame(()=>{
             editContent.dispatchEvent(new Event('editor-scroll-refresh'));
@@ -2222,50 +2865,62 @@ function openEdit(id){
         });
     });
 
-    setTimeout(()=>editTitle.focus(),30);
+    editDraftLastSnapshot='';
+    startEditDraftAutosave();
+    setTimeout(()=>editTitleOptions.querySelector('input:checked')?.focus()||editTitleOptions.querySelector('input')?.focus(),30);
 }
 async function saveEdit(){
     if(!unlocked||editSave.disabled)return;
     const item=state.find(x=>x.id===editingId);if(!item)return;
-    const title=String(editTitle.value??'').trim();
-    const subject=selectedSubject(editSubjectOptions);
+    const title=selectedTitle(editTitleOptions);
     const initialContent=getEditorHtml(editContent);
-    if(!title&&!hasMeaningfulContent(initialContent)){show('标题和内容不能同时为空','error');editTitle.focus();return;}
-    if(!subject){show('请选择科目','error');editSubjectOptions.querySelector('input')?.focus();return;}
-    const oldCode=item.code;
-    const oldSubject=item.subject;
-    let newCode=oldCode;
-    if(subject!==oldSubject){
-        try{newCode=allocateEntryCodeForSubject(subject);}catch(error){show(error.message||String(error),'error');return;}
-    }
+    if(!title){show('请选择标题','error');editTitleOptions.querySelector('input')?.focus();return;}
+    if(!hasMeaningfulContent(initialContent)){show('请输入内容','error');editContent.focus();return;}
     editSave.disabled=true;
     try{
-        if(newCode!==oldCode){
-            await migrateAttachmentFolder(oldCode,newCode);
-            rewriteEditorAttachmentCode(editContent,oldCode,newCode);
-        }
-        const content=await resolvePendingImages(editContent,newCode);
-        item.title=title;item.subject=subject;item.code=newCode;item.content=content;item.contentFormat='html';
-        closeEditModal();markLocalChange();show(newCode!==oldCode?`已保存 · 编码 ${newCode}`:'已保存','success');
-    }catch(error){console.error(error);show(`保存失败：${formatError(error)}`,'error');}
+        const attachmentFolder=normalizeAttachmentFolder(item.attachmentFolder)
+            ??(hasPendingImages(editContent)?allocateAttachmentFolder():null);
+        const content=await resolvePendingImages(editContent,attachmentFolder);
+        item.attachmentFolder=attachmentFolder;
+        item.title=title;
+        item.code=unixCodeFromCreatedAt(item.createdAt);
+        item.content=content;
+        item.contentFormat='html';
+
+        stopEditDraftAutosave();
+        await persistWorkingCopyNow(state);
+        await clearEditDraft();
+        closeEditModal(false);
+        markLocalChange();
+        show('已保存','success');
+    }catch(error){
+        console.error(error);
+        if(!editModal.classList.contains('hidden')&&editingId)startEditDraftAutosave();
+        show(`保存失败：${formatError(error)}`,'error');
+    }
     finally{editSave.disabled=false;}
 }
+
 async function deleteEntry(id){
     if(!unlocked)return false;
     const item=state.find(x=>x.id===id);if(!item)return false;
     if(!confirm(`确定删除这条 Test 吗？
 
-编码 ${item.code} 将被释放并优先复用；其附件文件夹也会删除。`))return false;
+其附件文件夹也会删除。`))return false;
     try{
-        await deleteAttachmentFolder(item.code);
-        state=state.filter(x=>x.id!==id);markLocalChange();show(`已删除 · 编码 ${item.code} 已释放`,'success');return true;
+        await deleteAttachmentFolder(item.attachmentFolder);
+        state=state.filter(x=>x.id!==id);
+        await persistWorkingCopyNow(state);
+        markLocalChange();
+        show('已删除','success');
+        return true;
     }catch(error){console.error(error);show(`删除失败：${formatError(error)}`,'error');return false;}
 }
 
 // ---------- 导入导出 ----------
 function downloadJson(){
     if(!unlocked)return;
-    const payload={schemaVersion:4,entries:normalizeState(state)};
+    const payload={schemaVersion:6,entries:normalizeState(state)};
     const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
@@ -2301,7 +2956,7 @@ function openConfig(){
     cfgRepo.value=config.repo;
     cfgFile.value=config.file||'test_data.json';
     cfgToken.value=config.token;
-    rememberToken.checked=Boolean(localGet(TOKEN_LOCAL_KEY));
+    rememberToken.checked=Boolean(appGet(TOKEN_KEY));
     updateVisibleViewportHeight();
     configModal.classList.remove('hidden');
     const scrollBody=configForm.querySelector('.dialog-scroll');
@@ -2321,11 +2976,16 @@ async function submitConfig(event){
 
     const oldTarget=target();
     config={owner,repo,file,token};
-    saveConfig();
+    try{
+        await saveConfig();
+    }catch(error){
+        show(`配置保存失败：${formatError(error)}`,'error');
+        return;
+    }
 
     if(oldTarget&&oldTarget!==target()){
         meta={target:'',fingerprint:null,sha:null,lastSyncAt:null};
-        saveMeta();
+        await saveMeta();
     }
 
     configModal.classList.add('hidden');
@@ -2334,18 +2994,6 @@ async function submitConfig(event){
 
 // ---------- 事件 ----------
 addBtn.addEventListener('click',addEntry);
-titleInput.addEventListener('keydown',event=>{
-    if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){
-        event.preventDefault();
-        addEntry();
-    }
-});
-codeInput.addEventListener('keydown',event=>{
-    if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){
-        event.preventDefault();
-        addEntry();
-    }
-});
 contentInput.addEventListener('keydown',event=>{
     if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){
         event.preventDefault();
@@ -2361,8 +3009,13 @@ cardsList.addEventListener('click',event=>{
 editDelete.addEventListener('click',async()=>{
     if(!editingId||editDelete.disabled)return;
     editDelete.disabled=true;
-    try{if(await deleteEntry(editingId))closeEditModal();}
-    finally{editDelete.disabled=false;}
+    try{
+        if(await deleteEntry(editingId)){
+            stopEditDraftAutosave();
+            await clearEditDraft();
+            closeEditModal(false);
+        }
+    }finally{editDelete.disabled=false;}
 });
 editCancel.addEventListener('click',closeEditModal);
 editSave.addEventListener('click',saveEdit);
@@ -2383,17 +3036,27 @@ editModal.addEventListener('pointerup',event=>{
     if(shouldClose)closeEditModal();
 });
 editModal.addEventListener('pointercancel',()=>{editOverlayPointer=null;});
-editTitle.addEventListener('keydown',event=>{
-    if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){
-        event.preventDefault();
-        saveEdit();
-    }
-});
 editContent.addEventListener('keydown',event=>{
     if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){
         event.preventDefault();
         saveEdit();
     }
+});
+
+// 草稿输入：0.5 秒防抖 + 5 秒强制快照；页面隐藏/退出时再补存一次。
+titleOptions.addEventListener('change',markAddDraftChanged);
+contentInput.addEventListener('input',markAddDraftChanged);
+editTitleOptions.addEventListener('change',markEditDraftChanged);
+editContent.addEventListener('input',markEditDraftChanged);
+document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden'){
+        saveAddDraftLocal(true);
+        saveEditDraftLocal(true);
+    }
+});
+window.addEventListener('pagehide',()=>{
+    saveAddDraftLocal(true);
+    saveEditDraftLocal(true);
 });
 
 configBtn.addEventListener('click',openConfig);
@@ -2443,6 +3106,14 @@ updateBackToTopVisibility();
 
 // ---------- 启动 ----------
 (async()=>{
+    requestPersistentDraftStorage();
+    try{
+        await initAppStorage();
+    }catch(error){
+        console.error('Test 浏览器持久化初始化失败',error);
+        show('浏览器持久化初始化失败；请检查 IndexedDB 权限','error');
+    }
+
     loadConfig();
     loadMeta();
     setUnlocked(false);
