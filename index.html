@@ -934,7 +934,8 @@ function cleanPublicDataFile(value){
     return file||'test_data.json';
 }
 
-const $=id=>document.getElementById(id);\nlet printMode=false;
+const $=id=>document.getElementById(id);
+let printMode=false;
 const statusDot=$('statusDot'),statusText=$('statusText'),syncBtn=$('syncBtn'),configBtn=$('configBtn'),
 exportBtn=$('exportBtn'),importBtn=$('importBtn'),fileInput=$('fileInput'),lastSyncTime=$('lastSyncTime'),
 lockedPanel=$('lockedPanel'),lockedConfigBtn=$('lockedConfigBtn'),appContent=$('appContent'),editorSection=$('editorSection'),
@@ -3103,7 +3104,9 @@ window.addEventListener('pagehide',()=>{
     saveEditDraftLocal(true);
 });
 
-configBtn.addEventListener('click',openConfig);\nconst printBtn=$('printBtn');\nprintBtn?.addEventListener('click',()=>{if(printMode)createPrintPdf();else togglePrintMode();});
+configBtn.addEventListener('click',openConfig);
+const printBtn=$('printBtn');
+printBtn?.addEventListener('click',()=>{if(printMode)createPrintPdf();else togglePrintMode();});
 lockedConfigBtn.addEventListener('click',openConfig);
 configCancel.addEventListener('click',()=>configModal.classList.add('hidden'));
 configForm.addEventListener('submit',submitConfig);
