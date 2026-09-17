@@ -700,16 +700,6 @@ button{cursor:pointer}
         font-size: 0.68rem;
     }
 }
-
-.print-select-mode .print-check{display:inline-block!important}
-.print-check{
- display:none;
- width:16px;
- height:16px;
- margin-right:.55rem;
- vertical-align:middle;
-}
-
 </style>
 </head>
 <body>
@@ -727,7 +717,7 @@ button{cursor:pointer}
             <button class="btn btn-sync" id="syncBtn" type="button" disabled>同步</button>
             <button class="btn" id="configBtn" type="button">编辑登录</button>
             <button class="btn" id="exportBtn" type="button" disabled>导出</button>
-            <button class="btn" id="importBtn" type="button" disabled>导入</button><button class="btn" id="printBtn" type="button">打印</button>
+            <button class="btn" id="importBtn" type="button" disabled>导入</button>
             <input type="file" id="fileInput" accept=".json,application/json" hidden>
         </div>
         <span class="last-sync" id="lastSyncTime">正在加载公开内容…</span>
@@ -2065,7 +2055,7 @@ function render(){
     }
 
     cardsList.innerHTML=state.map(item=>`
-        <article class="cards-item" data-id="${attr(item.id)}"><input class="print-check" type="checkbox" data-print-id="${attr(item.id)}">
+        <article class="cards-item" data-id="${attr(item.id)}">
             ${item.title?`<h3 class="cards-title">${esc(item.title)}</h3>`:''}
             <div class="cards-content">${renderMarkdownLinks(item.content)}</div>
             <div class="cards-footer">
@@ -3137,105 +3127,6 @@ updateBackToTopVisibility();
     }
 })();
 })();
-
-
-
-// ---------- 独立打印模块（不修改核心状态） ----------
-(()=>{
-    const btn=document.getElementById('printBtn');
-    if(!btn)return;
-
-    let printMode=false;
-
-    function enterPrintMode(){
-        printMode=true;
-        document.body.classList.add('print-select-mode');
-        btn.textContent='生成PDF';
-
-        document.querySelectorAll('.print-check').forEach(el=>{
-            el.checked=false;
-        });
-    }
-
-    function exitPrintMode(){
-        printMode=false;
-        document.body.classList.remove('print-select-mode');
-        document.querySelectorAll('.print-check').forEach(el=>{
-            el.checked=false;
-        });
-        btn.textContent='打印';
-    }
-
-    function getSelected(){
-        const ids=[...document.querySelectorAll('.print-check:checked')]
-            .map(el=>el.dataset.printId);
-
-        if(!Array.isArray(state))return [];
-
-        return state.filter(item=>ids.includes(String(item.id)));
-    }
-
-    function printSelected(items){
-        const w=window.open('','_blank');
-        if(!w){
-            alert('无法打开打印窗口');
-            return;
-        }
-
-        w.document.write(`
-        <!doctype html>
-        <html>
-        <head>
-        <meta charset="UTF-8">
-        <title>PDF</title>
-        <style>
-        @page{margin:20mm}
-        body{
-            font-family:"Microsoft YaHei",sans-serif;
-            line-height:1.8;
-        }
-        .item{
-            margin-bottom:36px;
-            page-break-inside:avoid;
-        }
-        </style>
-        </head>
-        <body>
-        ${items.map(x=>`<div class="item">${x.content||''}</div>`).join('')}
-        </body>
-        </html>`);
-
-        w.document.close();
-
-        w.onload=()=>{
-            w.print();
-        };
-
-        w.onafterprint=()=>{
-            exitPrintMode();
-            try{w.close()}catch(e){}
-        };
-    }
-
-    btn.addEventListener('click',()=>{
-        if(!printMode){
-            enterPrintMode();
-            return;
-        }
-
-        const items=getSelected();
-
-        if(!items.length){
-            alert('请先勾选条目');
-            return;
-        }
-
-        printSelected(items);
-    });
-
-    window.exitPrintMode=exitPrintMode;
-})();
-
 </script>
 </body>
 </html>
