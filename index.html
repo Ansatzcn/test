@@ -2059,8 +2059,7 @@ function render(){
     }
 
     cardsList.innerHTML=state.map(item=>`
-        <article class="cards-item" data-id="${attr(item.id)}"><input class="print-check" type="checkbox" data-print-id="${attr(item.id)}">
-            ${item.title?`<h3 class="cards-title">${esc(item.title)}</h3>`:''}
+        <article class="cards-item" data-id="${attr(item.id)}">${item.title?`<h3 class="cards-title">${esc(item.title)}</h3>`:''}
             <div class="cards-content">${renderMarkdownLinks(item.content)}</div>
             <div class="cards-footer">
                 <div class="cards-code">${esc(unixCodeFromCreatedAt(item.createdAt))}</div>
