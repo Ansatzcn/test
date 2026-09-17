@@ -700,6 +700,18 @@ button{cursor:pointer}
         font-size: 0.68rem;
     }
 }
+
+.print-check{
+    display:none;
+    margin-right:.65rem;
+    width:18px;
+    height:18px;
+    vertical-align:middle;
+}
+.print-mode .print-check{display:inline-block}
+.print-action-bar{
+    display:none;
+}
 </style>
 </head>
 <body>
@@ -715,7 +727,7 @@ button{cursor:pointer}
     <section class="toolbar">
         <div class="toolbar-group">
             <button class="btn btn-sync" id="syncBtn" type="button" disabled>同步</button>
-            <button class="btn" id="configBtn" type="button">编辑登录</button>
+            <button class="btn" id="configBtn" type="button">编辑登录</button><button class="btn" id="printBtn" type="button">打印</button>
             <button class="btn" id="exportBtn" type="button" disabled>导出</button>
             <button class="btn" id="importBtn" type="button" disabled>导入</button>
             <input type="file" id="fileInput" accept=".json,application/json" hidden>
@@ -922,7 +934,7 @@ function cleanPublicDataFile(value){
     return file||'test_data.json';
 }
 
-const $=id=>document.getElementById(id);
+const $=id=>document.getElementById(id);\nlet printMode=false;
 const statusDot=$('statusDot'),statusText=$('statusText'),syncBtn=$('syncBtn'),configBtn=$('configBtn'),
 exportBtn=$('exportBtn'),importBtn=$('importBtn'),fileInput=$('fileInput'),lastSyncTime=$('lastSyncTime'),
 lockedPanel=$('lockedPanel'),lockedConfigBtn=$('lockedConfigBtn'),appContent=$('appContent'),editorSection=$('editorSection'),
@@ -2041,6 +2053,38 @@ async function deleteAttachmentFolder(folder){
     await deleteRepoTree([attachmentBaseDir(),String(valid)].filter(Boolean).join('/'));
 }
 
+
+function createPrintPdf(){
+    const ids=[...document.querySelectorAll('.print-check:checked')].map(x=>x.dataset.printId);
+    if(!ids.length){show('请先勾选需要打印的条目','error');return;}
+    const selected=state.filter(x=>ids.includes(x.id));
+    const win=window.open('','_blank');
+    if(!win){show('浏览器阻止了打印窗口','error');return;}
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Test PDF</title>
+    <style>
+    @page{margin:22mm}
+    body{font-family:"Times New Roman","Microsoft YaHei",serif;color:#111;line-height:1.8}
+    .item{margin-bottom:32px;page-break-inside:avoid}
+    .content{font-size:12pt}
+    </style></head><body>
+    ${selected.map(x=>`<div class="item"><div class="content">${renderMarkdownLinks(x.content)}</div></div>`).join('')}
+    </body></html>`);
+    win.document.close();
+    ensureMathJax().then(()=>setTimeout(()=>{win.print();},500));
+}
+function togglePrintMode(){
+    printMode=!printMode;
+    document.body.classList.toggle('print-mode',printMode);
+    if(printMode){
+        const btn=document.getElementById('printBtn');
+        if(btn)btn.textContent='生成PDF';
+    }else{
+        const btn=document.getElementById('printBtn');
+        if(btn)btn.textContent='打印';
+    }
+    render();
+}
+
 // ---------- 渲染 ----------
 function render(){
     state=normalizeState(state);
@@ -3059,7 +3103,7 @@ window.addEventListener('pagehide',()=>{
     saveEditDraftLocal(true);
 });
 
-configBtn.addEventListener('click',openConfig);
+configBtn.addEventListener('click',openConfig);\nconst printBtn=$('printBtn');\nprintBtn?.addEventListener('click',()=>{if(printMode)createPrintPdf();else togglePrintMode();});
 lockedConfigBtn.addEventListener('click',openConfig);
 configCancel.addEventListener('click',()=>configModal.classList.add('hidden'));
 configForm.addEventListener('submit',submitConfig);
