@@ -3138,88 +3138,99 @@ updateBackToTopVisibility();
 })();
 })();
 
-// ---------- 独立打印模块 ----------
+
+
+// ---------- 独立打印模块（不修改核心状态） ----------
 (()=>{
     const btn=document.getElementById('printBtn');
     if(!btn)return;
 
     let printMode=false;
 
-    function exitPrintMode(){
-        printMode=false;
-        document.body.classList.remove('print-select-mode');
-        btn.textContent='打印';
+    function enterPrintMode(){
+        printMode=true;
+        document.body.classList.add('print-select-mode');
+        btn.textContent='生成PDF';
 
         document.querySelectorAll('.print-check').forEach(el=>{
             el.checked=false;
         });
-
-        if(typeof render==='function')render();
     }
 
-    function selectedPrintItems(){
+    function exitPrintMode(){
+        printMode=false;
+        document.body.classList.remove('print-select-mode');
+        document.querySelectorAll('.print-check').forEach(el=>{
+            el.checked=false;
+        });
+        btn.textContent='打印';
+    }
+
+    function getSelected(){
         const ids=[...document.querySelectorAll('.print-check:checked')]
             .map(el=>el.dataset.printId);
 
         if(!Array.isArray(state))return [];
-        return state.filter(item=>ids.includes(item.id));
+
+        return state.filter(item=>ids.includes(String(item.id)));
     }
 
-    function openPrintPage(items){
-        const win=window.open('','_blank');
-        if(!win)return;
+    function printSelected(items){
+        const w=window.open('','_blank');
+        if(!w){
+            alert('无法打开打印窗口');
+            return;
+        }
 
-        win.document.write(`
-<!doctype html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>PDF</title>
-<style>
-@page{margin:20mm}
-body{
- font-family:"Microsoft YaHei",sans-serif;
- line-height:1.8;
-}
-.print-item{
- margin-bottom:36px;
- page-break-inside:avoid;
-}
-</style>
-</head>
-<body>
-${items.map(item=>`<div class="print-item">${item.content||''}</div>`).join('')}
-</body>
-</html>`);
+        w.document.write(`
+        <!doctype html>
+        <html>
+        <head>
+        <meta charset="UTF-8">
+        <title>PDF</title>
+        <style>
+        @page{margin:20mm}
+        body{
+            font-family:"Microsoft YaHei",sans-serif;
+            line-height:1.8;
+        }
+        .item{
+            margin-bottom:36px;
+            page-break-inside:avoid;
+        }
+        </style>
+        </head>
+        <body>
+        ${items.map(x=>`<div class="item">${x.content||''}</div>`).join('')}
+        </body>
+        </html>`);
 
-        win.document.close();
+        w.document.close();
 
-        setTimeout(()=>{
-            win.print();
-            win.onafterprint=()=>{
-                exitPrintMode();
-            };
-        },500);
+        w.onload=()=>{
+            w.print();
+        };
+
+        w.onafterprint=()=>{
+            exitPrintMode();
+            try{w.close()}catch(e){}
+        };
     }
 
     btn.addEventListener('click',()=>{
         if(!printMode){
-            printMode=true;
-            document.body.classList.add('print-select-mode');
-            btn.textContent='生成PDF';
-            if(typeof render==='function')render();
+            enterPrintMode();
             return;
         }
 
-        const items=selectedPrintItems();
+        const items=getSelected();
 
         if(!items.length){
-            if(typeof showToast==='function')
-                showToast('请先选择条目','error');
+            alert('请先勾选条目');
             return;
         }
 
-        openPrintPage(items);
+        printSelected(items);
     });
 
     window.exitPrintMode=exitPrintMode;
