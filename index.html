@@ -722,7 +722,7 @@ button{cursor:pointer}
             <button class="btn" id="configBtn" type="button">编辑登录</button>
             <button class="btn" id="exportBtn" type="button" disabled>导出</button>
             <button class="btn" id="importBtn" type="button" disabled>导入</button>
-            <input type="file" id="fileInput" accept=".json,application/json" hidden>
+            <input type="file" id="fileInput" accept=".html,.htm,text/html,.json,application/json" hidden>
         </div>
         <span class="last-sync" id="lastSyncTime">正在加载公开内容…</span>
     </section>
@@ -2921,35 +2921,132 @@ async function deleteEntry(id){
 }
 
 // ---------- 导入导出 ----------
-function downloadJson(){
+// 默认导出为可直接查看、同时可重新导入本站的 HTML 备份。
+// 备份内嵌完整结构化数据；即使远端 JSON 损坏，也能用此 HTML 恢复。
+const HTML_BACKUP_DATA_ID='test-backup-data';
+const HTML_BACKUP_MAX_BYTES=2*1024*1024;
+
+function backupSiteName(){
+    const raw=clean(document.title||'test').toLowerCase();
+    const safe=raw
+        .replace(/[\\/:*?"<>|\u0000-\u001f]/g,'')
+        .replace(/\s+/g,'');
+    return safe||'test';
+}
+function jsonForHtmlScript(value){
+    return JSON.stringify(value,null,2)
+        .replace(/</g,'\\u003c')
+        .replace(/>/g,'\\u003e')
+        .replace(/&/g,'\\u0026')
+        .replace(/\u2028/g,'\\u2028')
+        .replace(/\u2029/g,'\\u2029');
+}
+function buildHtmlBackup(payload,exportedAt,unixTimestamp){
+    const siteName=backupSiteName();
+    const entries=normalizeState(payload.entries);
+    const data=jsonForHtmlScript({
+        ...payload,
+        backupFormat:'test-html-backup-v1',
+        siteName,
+        exportedAt,
+        exportedUnix:unixTimestamp,
+        entries
+    });
+    const snapshot=entries.length
+        ? entries.map(item=>`
+            <article class="backup-item">
+                <h2>${esc(item.title)}</h2>
+                <div class="backup-content">${renderMarkdownLinks(item.content)}</div>
+                <div class="backup-meta">${esc(unixCodeFromCreatedAt(item.createdAt))}</div>
+            </article>`).join('')
+        : '<div class="backup-empty">暂无 Test</div>';
+
+    return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="test-backup-format" content="test-html-backup-v1">
+<title>${esc(document.title||'Test')} 备份</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:32px 16px 56px;background:#f5f7fa;color:#0f172a;font-family:"Times New Roman","Microsoft YaHei","PingFang SC",serif}.backup-wrap{width:min(100%,1100px);margin:auto;padding:32px 28px;background:#fff;border-radius:28px;box-shadow:0 20px 40px -12px rgba(0,0,0,.15)}.backup-head{padding-bottom:18px;border-bottom:2px solid #e8edf4}.backup-head h1{margin:0 0 10px;font-size:2rem}.backup-note,.backup-meta{color:#64748b;font-size:.86rem;line-height:1.6}.backup-list{display:flex;flex-direction:column;gap:20px;margin-top:24px}.backup-item{padding:22px;border:1px solid #e2e8f0;border-radius:20px}.backup-item h2{margin:0 0 10px;color:#1E40AF;font-size:1.08rem}.backup-content{line-height:1.72;overflow-wrap:anywhere}.backup-content img{display:block;max-width:100%;height:auto;margin:.75em auto;border-radius:10px}.backup-content table{width:100%;margin:.8em 0;border-collapse:collapse}.backup-content th,.backup-content td{padding:.38em .55em;border:1px solid #cbd5e1;vertical-align:top}.backup-content th{background:#f8fafc}.backup-content blockquote{margin:.55em 0;padding:.25em .8em;border-left:3px solid #cbd5e1;color:#475569}.backup-content a{color:#1E40AF}.backup-meta{margin-top:10px}.backup-empty{padding:40px;text-align:center;color:#94a3b8}@media(max-width:700px){body{padding:12px}.backup-wrap{padding:22px 18px;border-radius:20px}.backup-item{padding:18px 16px}}
+</style>
+</head>
+<body>
+<main class="backup-wrap">
+    <header class="backup-head">
+        <h1>${esc(document.title||'Test')}</h1>
+        <div class="backup-note">HTML 数据安全备份 · 导出时间 ${esc(exportedAt)} · Unix ${unixTimestamp} · 共 ${entries.length} 条</div>
+        <div class="backup-note">此文件内嵌导出时刻的完整结构化数据，可在本站“导入”功能中直接恢复。</div>
+    </header>
+    <section class="backup-list">${snapshot}
+    </section>
+</main>
+<script type="application/json" id="${HTML_BACKUP_DATA_ID}">${data}<\/script>
+</body>
+</html>`;
+}
+function downloadHtmlBackup(){
     if(!unlocked)return;
+    const now=new Date();
+    const unixTimestamp=Math.floor(now.getTime()/1000);
+    if(!/^\d{10}$/.test(String(unixTimestamp))){
+        show('当前时间无法生成 10 位 Unix 时间戳','error');
+        return;
+    }
     const payload={schemaVersion:6,entries:normalizeState(state)};
-    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+    const html=buildHtmlBackup(payload,now.toISOString(),unixTimestamp);
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;
-    a.download=`test_backup_${formatDate(new Date().toISOString())}.json`;
+    a.download=`${backupSiteName()}${unixTimestamp}.html`;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(()=>URL.revokeObjectURL(url),0);
+}
+function validateImportedPayload(value){
+    const validShape=Array.isArray(value)||(value&&typeof value==='object'&&Array.isArray(value.entries));
+    if(!validShape)throw new Error('备份中未找到有效的数据列表');
+    return normalizeState(value);
+}
+function parseImportedBackup(text){
+    const raw=String(text??'').replace(/^\uFEFF/,'').trim();
+    if(!raw)throw new Error('文件为空');
+
+    // 兼容过去导出的 JSON 备份。
+    if(raw.startsWith('{')||raw.startsWith('[')){
+        return validateImportedPayload(JSON.parse(raw));
+    }
+
+    const doc=new DOMParser().parseFromString(raw,'text/html');
+    const backupNode=doc.getElementById(HTML_BACKUP_DATA_ID);
+    if(!backupNode||backupNode.tagName!=='SCRIPT'){
+        throw new Error('不是本站生成的 HTML 备份，或备份数据已损坏');
+    }
+    const payloadText=(backupNode.textContent||'').trim();
+    if(!payloadText)throw new Error('HTML 备份中没有可恢复的数据');
+    return validateImportedPayload(JSON.parse(payloadText));
 }
 function importFile(file){
     if(!unlocked||!file)return;
-    if(file.size>MAX_BYTES){
-        show('文件超过 750 KB','error');
+    if(file.size>HTML_BACKUP_MAX_BYTES){
+        show('导入文件超过 2 MB','error');
         return;
     }
     const reader=new FileReader();
     reader.onload=e=>{
         try{
-            const incoming=normalizeState(JSON.parse(e.target.result));
+            const incoming=parseImportedBackup(e.target.result);
             if(!confirm('导入会替换当前 Test 数据，确定继续吗？'))return;
             state=incoming;
+            persistWorkingCopyNow(state).catch(error=>console.error('导入后的本地工作副本保存失败',error));
             markLocalChange();
             show('导入成功','success');
         }catch(error){
             show(`导入失败：${error.message}`,'error');
         }
     };
+    reader.onerror=()=>show('导入失败：无法读取文件','error');
     reader.readAsText(file,'utf-8');
 }
 
@@ -3068,7 +3165,7 @@ configCancel.addEventListener('click',()=>configModal.classList.add('hidden'));
 configForm.addEventListener('submit',submitConfig);
 
 syncBtn.addEventListener('click',()=>sync(true,true));
-exportBtn.addEventListener('click',downloadJson);
+exportBtn.addEventListener('click',downloadHtmlBackup);
 importBtn.addEventListener('click',()=>fileInput.click());
 fileInput.addEventListener('change',()=>{
     importFile(fileInput.files?.[0]);
