@@ -4,22 +4,12 @@
     {
       "id": "4c3ea4b0-b6d8-425f-ba49-a2a5f5af2cb9",
       "attachmentFolder": null,
-      "code": "17891202",
+      "code": "26091101",
       "title": "语文",
       "source": "",
       "content": "<div>给汉字圈出正确的读音：</div><div><ol><li>欢迎（yíng yín）</li><li>冲毁（huì huǐ）</li><li>灾害（zāi zhāi）</li><li>淹没（mò méi）</li></ol></div>",
       "contentFormat": "html",
       "createdAt": "2026-09-11T09:50:24.642Z"
-    },
-    {
-      "id": "4ff10eeb-ea3c-4ebf-b889-112fd5ed44fd",
-      "attachmentFolder": null,
-      "code": "17897445",
-      "title": "数学",
-      "source": "",
-      "content": "<div>28+▲=34+★，问：▲与★谁大谁小？</div><div>42-▲=39-★，问：▲与★谁大谁小？</div><div>19+▲=47-★，问：▲与★谁大谁小？</div><div><br></div>",
-      "contentFormat": "html",
-      "createdAt": "2026-09-18T15:15:02.559Z"
     }
   ]
 }
